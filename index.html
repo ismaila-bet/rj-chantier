@@ -1269,10 +1269,11 @@ function handleFile(e){
     drop.innerHTML='<img src="'+ev.target.result+'" style="width:100%;height:100%;object-fit:cover" />';
   };r.readAsDataURL(file);
 }
-function closeMoPh(){document.getElementById("mo-ph").classList.remove("on");_phCtx=null;}
+function closeMoPh(){document.getElementById("mo-ph").classList.remove("on");_phCtx=null;_constCtx=null;}
 async function addPhoto(){
-  if(!_phCtx){toast("Contexte manquant","er");return;}
+  /* Priorité au contexte constat si ouvert via openConstatPhoto() */
   if(_constCtx)return addConstatPhoto();
+  if(!_phCtx){toast("Contexte manquant","er");return;}
   if(_phCtx&&_phCtx.tkey)return addPhotoEsp();
   var file=document.getElementById("pfi").files[0];
   if(!file){toast("Aucune image","er");return;}
@@ -1711,101 +1712,166 @@ function exportPDF(){
     return;
   }
 
-  /* Détecter si jsPDF est disponible (chargé depuis CDN) */
-  var hasjsPDF = (typeof window.jspdf !== "undefined") || (typeof jsPDF !== "undefined");
-  var hasH2C   = (typeof html2canvas !== "undefined");
-
-  /* Sur iOS / mobile sans impression native fiable → jsPDF */
   var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-  var isMobile = /Mobi|Android/i.test(navigator.userAgent) || isIOS;
 
-  if(hasjsPDF && hasH2C){
-    exportPDFjsPDF();
+  if(isIOS){
+    /* iOS : générer PDF via jsPDF + html2canvas */
+    var hasjsPDF = (typeof window.jspdf !== "undefined") || (typeof jsPDF !== "undefined");
+    var hasH2C   = (typeof html2canvas !== "undefined");
+    if(hasjsPDF && hasH2C){
+      exportPDFjsPDF();
+    } else {
+      toast("Chargement librairies PDF...", "ok");
+      setTimeout(function(){
+        if((typeof window.jspdf !== "undefined") && (typeof html2canvas !== "undefined")){
+          exportPDFjsPDF();
+        } else {
+          toast("PDF non disponible hors-ligne","er");
+        }
+      }, 2000);
+    }
   } else {
-    /* Fallback : impression navigateur (desktop Chrome/Safari) */
+    /* PC / Desktop : impression native → PDF via le navigateur */
     var pt = document.getElementById("print-target");
-    if(!pt){ pt = document.createElement("div"); pt.id="print-target"; pt.style.cssText="display:none;"; document.body.appendChild(pt); }
+    if(!pt){
+      pt = document.createElement("div");
+      pt.id = "print-target";
+      pt.style.cssText = "display:none;";
+      document.body.appendChild(pt);
+    }
     pt.innerHTML = prevContent.innerHTML;
     window.print();
-    setTimeout(function(){ pt.innerHTML=""; }, 2000);
-    toast("Impression lancée","ok");
+    setTimeout(function(){ pt.innerHTML = ""; }, 3000);
+    toast("Fenêtre impression ouverte — choisir 'Enregistrer en PDF'", "ok");
   }
 }
 
 async function exportPDFjsPDF(){
-  toast("Génération PDF...", "ok");
+  toast("Génération PDF en cours...", "ok");
 
   var prevContent = document.getElementById("prev-content");
-  var pages = prevContent.querySelectorAll(".prev-page");
+  var pages = Array.from(prevContent.querySelectorAll(".prev-page"));
   if(!pages.length){ toast("Aperçu vide","er"); return; }
 
-  /* Récupérer jsPDF */
   var jspdfLib = (typeof window.jspdf !== "undefined") ? window.jspdf.jsPDF : jsPDF;
-  var doc = new jspdfLib({ orientation:"portrait", unit:"mm", format:"a4" });
+  /* A4 en mm */
   var A4_W = 210, A4_H = 297;
+  var MARGIN = 10; /* 10mm de chaque côté */
+  var CONTENT_W = A4_W - 2*MARGIN;
+  var CONTENT_H = A4_H - 2*MARGIN;
+  /* Largeur de capture en px correspondant à A4 à 96dpi = 794px */
+  var CAPTURE_W = 794;
+
+  var doc = new jspdfLib({ orientation:"portrait", unit:"mm", format:"a4" });
 
   for(var i=0; i<pages.length; i++){
-    var page = pages[i];
-    /* Rendre la page visible temporairement pour html2canvas */
-    var clone = page.cloneNode(true);
+    /* Cloner et positionner hors écran mais visible pour html2canvas */
+    var clone = pages[i].cloneNode(true);
     clone.style.cssText = [
-      "position:fixed","top:0","left:0",
-      "width:800px","background:#fff",
-      "z-index:-9999","pointer-events:none",
+      "position:fixed",
+      "top:0",
+      "left:-9999px",          /* Hors écran mais pas display:none */
+      "width:" + CAPTURE_W + "px",
+      "min-height:auto",
+      "background:#ffffff",
+      "box-shadow:none",
+      "margin:0",
+      "padding:36px 44px 44px",
+      "box-sizing:border-box",
       "font-family:Calibri,Arial,sans-serif",
-      "font-size:10.5pt","line-height:1.55","color:#2d1f0e",
-      "padding:40px 48px 52px",
-      "box-sizing:border-box"
+      "font-size:10pt",
+      "line-height:1.5",
+      "color:#2d1f0e",
+      "z-index:-9999",
+      "overflow:visible"
     ].join(";");
     document.body.appendChild(clone);
 
+    /* Laisser le DOM se rendre avant la capture */
+    await new Promise(function(res){ setTimeout(res, 120); });
+
     try{
       var canvas = await html2canvas(clone, {
-        scale: 2,
+        scale: 2,                    /* 2x pour qualité */
         useCORS: true,
         allowTaint: true,
         backgroundColor: "#ffffff",
         logging: false,
-        width: 800,
-        windowWidth: 800
+        width: CAPTURE_W,
+        windowWidth: CAPTURE_W + 100,
+        scrollX: 0,
+        scrollY: 0,
+        x: 0,
+        y: 0
       });
-      var imgData = canvas.toDataURL("image/jpeg", 0.92);
-      var imgW = A4_W - 20; /* marges 10mm de chaque côté */
-      var imgH = (canvas.height * imgW) / canvas.width;
-      var yOffset = 10;
+
+      /* Dimensions réelles capturées → convertir en mm proportionnellement */
+      var pxW = canvas.width;   /* = CAPTURE_W * 2 (scale 2) */
+      var pxH = canvas.height;
+
+      /* Largeur dans le PDF = CONTENT_W, hauteur proportionnelle */
+      var mmW = CONTENT_W;
+      var mmH = (pxH / pxW) * mmW;
 
       if(i > 0) doc.addPage();
 
-      /* Si la page dépasse A4, la scaler */
-      if(imgH > A4_H - 20){
-        var scale = (A4_H - 20) / imgH;
-        imgW = imgW * scale;
-        imgH = (A4_H - 20);
-      }
+      /* Si le contenu est plus haut que A4 : on pagine automatiquement */
+      if(mmH <= CONTENT_H){
+        /* Tient sur une page → centrer verticalement */
+        var yTop = MARGIN;
+        doc.addImage(
+          canvas.toDataURL("image/jpeg", 0.92),
+          "JPEG", MARGIN, yTop, mmW, mmH
+        );
+      } else {
+        /* Trop haut → découper en tranches A4 */
+        var pxPerMm = pxW / mmW;
+        var sliceH_px = Math.floor(CONTENT_H * pxPerMm);
+        var offset_px = 0;
+        var first = true;
 
-      doc.addImage(imgData, "JPEG", 10, yOffset, imgW, imgH);
+        while(offset_px < pxH){
+          /* Créer un canvas de la tranche */
+          var sliceCanvas = document.createElement("canvas");
+          sliceCanvas.width  = pxW;
+          sliceCanvas.height = Math.min(sliceH_px, pxH - offset_px);
+          var ctx = sliceCanvas.getContext("2d");
+          ctx.drawImage(canvas, 0, -offset_px);
+
+          var sliceMmH = (sliceCanvas.height / pxW) * mmW;
+
+          if(!first) doc.addPage();
+          first = false;
+
+          doc.addImage(
+            sliceCanvas.toDataURL("image/jpeg", 0.92),
+            "JPEG", MARGIN, MARGIN, mmW, sliceMmH
+          );
+          offset_px += sliceH_px;
+        }
+      }
     } finally {
       document.body.removeChild(clone);
     }
   }
 
-  /* Nommer le fichier */
+  /* Nommer et sauvegarder */
   var d = (S.ident && S.ident.date) ? S.ident.date : new Date().toISOString().slice(0,10);
   var n = (S.ident && S.ident.numero) ? "_N"+S.ident.numero : "";
   var filename = "RJ_Ambassade"+n+"_"+d+".pdf";
 
-  /* Sur iOS : ouvrir dans un nouvel onglet (le navigateur propose de partager/sauvegarder) */
-  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-  if(isIOS){
-    var blob = doc.output("blob");
-    var url  = URL.createObjectURL(blob);
-    window.open(url, "_blank");
-    setTimeout(function(){ URL.revokeObjectURL(url); }, 30000);
-    toast("PDF ouvert — Appuyer sur Partager pour sauvegarder", "ok");
-  } else {
-    doc.save(filename);
-    toast("PDF téléchargé ✓", "ok");
-  }
+  var blob = doc.output("blob");
+  var url  = URL.createObjectURL(blob);
+  /* iOS : ouvrir dans un nouvel onglet → Partager → Enregistrer dans Fichiers */
+  var a = document.createElement("a");
+  a.href = url;
+  a.target = "_blank";
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 60000);
+  toast("PDF généré ✓ — Appuyer sur Partager pour sauvegarder", "ok");
 }
 function doGenWord(){collectState();showPreview();}
 
