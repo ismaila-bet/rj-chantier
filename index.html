@@ -369,7 +369,7 @@ select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.o
 .prev-meteo-impact{font-size:9pt;color:#8b2e1a;font-style:italic;padding:6px 10px;background:#fdf0ee;border-left:3px solid #8b2e1a;border-radius:0 4px 4px 0;margin-top:6px}
 
 /* ── Cage blocks ── */
-.prev-cage{margin-top:0;break-before:page;page-break-before:always;page-break-inside:avoid;break-inside:avoid}.prev-cage:first-child{break-before:auto;page-break-before:auto}.prev-ph-item{break-inside:avoid;page-break-inside:avoid}.prev-lot-grp{break-inside:avoid;page-break-inside:avoid}.prev-esp{break-inside:avoid;page-break-inside:avoid}.prev-appt-hdr{break-after:avoid;page-break-after:avoid}
+.prev-cage{margin-top:0;page-break-inside:avoid;break-inside:avoid}.prev-ph-item{break-inside:avoid;page-break-inside:avoid}.prev-lot-grp{break-inside:avoid;page-break-inside:avoid}.prev-esp{break-inside:avoid;page-break-inside:avoid}.prev-appt-hdr{break-after:avoid;page-break-after:avoid}
 .prev-cage-hdr{color:#fff;font-size:13pt;font-weight:bold;padding:8px 14px;border-radius:6px 6px 0 0;margin-bottom:0;letter-spacing:.02em}
 .prev-appt{margin:0 0 10px;border:1px solid #d8ccb8;border-radius:0 0 6px 6px;overflow:hidden}
 .prev-appt-hdr{background:#ede6d8;padding:6px 12px;font-weight:bold;font-size:10pt;border-bottom:1px solid #d8ccb8;display:flex;align-items:center;gap:6px}
@@ -391,13 +391,15 @@ select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.o
 .prev-ph-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}.prev-ph-item{break-inside:avoid;page-break-inside:avoid}.prev-ph-item img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;border-radius:4px;border:1px solid #d8ccb8}
 .prev-ph-cap{font-size:8pt;color:#7a6548;margin-top:3px;line-height:1.3}
 .prev-ph-cap strong{color:#2d1f0e}
+.bilan-section{break-before:page;page-break-before:always}
+.bilan-titre{margin-top:0!important;break-after:avoid;page-break-after:avoid}
 .ph-resize-btn{display:inline-block}
 @media print{.ph-resize-btn{display:none!important}}
 
 /* ── Pied de page ── */
 .prev-footer{margin-top:32px;padding-top:10px;border-top:1px solid #d8ccb8;display:flex;justify-content:space-between;font-size:8pt;color:#7a6548}
 /* Cage block aperçu */
-.prev-cage{margin-top:0;break-before:page;page-break-before:always;page-break-inside:avoid;break-inside:avoid}.prev-cage:first-child{break-before:auto;page-break-before:auto}
+.prev-cage{margin-top:0;break-before:page;page-break-before:always;page-break-inside:avoid;break-inside:avoid}.prev-cage.first-cage{break-before:avoid;page-break-before:avoid}
 .prev-cage-hdr{background:#2d5a3d;color:#fff;font-size:13pt;font-weight:bold;padding:8px 14px;border-radius:6px 6px 0 0;margin-bottom:0}
 .prev-appt-hdr{background:#ede6d8;padding:6px 12px;font-weight:bold;font-size:10pt;color:#2d5a3d;border-bottom:1px solid #d8ccb8}
 .prev-esp-name{font-size:9pt;font-weight:bold;color:#7a4f2d;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
@@ -1872,8 +1874,9 @@ function showPreview(){
     var planSt=S.planning[cage]||{};
     var cagePhotos=S.photos.filter(function(p){return p.cage===cage;});
     if(!cagePhotos.length&&!Object.keys(planSt).length)return;
+    var isFirst = bilanH.length === 0;
     hasBilan=true;
-    bilanH+="<div class='prev-cage'>";
+    bilanH+="<div class='prev-cage"+(isFirst?" first-cage":"")+"'>";
     bilanH+="<div class='prev-cage-hdr' style='background:"+col+"'>"+cfg.label+" &mdash; "+cfg.sub+"</div>";
     bilanH+="<div class='prev-appt'>";
     var appts=cage==="EXT"?["EXT"]:(CAGES[cage]&&CAGES[cage].lg)||[];
@@ -1967,9 +1970,9 @@ function showPreview(){
   });
 
   if(hasBilan){
-    /* Titre bilan sur nouvelle page, chaque cage aussi */
-    p2+="<div style='break-before:page;page-break-before:always;margin-top:0'>"
-      +"<div class='sh' style='margin-top:0'><span class='sn'>05</span>Bilan par cage &mdash; T&acirc;ches &amp; Photos</div>"
+    /* Titre bilan sur nouvelle page via classe CSS, 1ère cage suit sans break */
+    p2+="<div class='bilan-section'>"
+      +"<div class='sh bilan-titre'><span class='sn'>05</span>Bilan par cage &mdash; T&acirc;ches &amp; Photos</div>"
       +bilanH
       +"</div>";
   }
@@ -2030,132 +2033,108 @@ function exportPDF(){
 }
 
 async function exportPDFjsPDF(){
-  toast("Génération PDF en cours...", "ok");
+  toast("Génération PDF...","ok");
+  var prevContent=document.getElementById("prev-content");
+  if(!prevContent){toast("Aperçu vide","er");return;}
+  if(typeof window.jspdf==="undefined"&&typeof jsPDF==="undefined"){
+    toast("jsPDF non chargé","er");return;
+  }
+  var jspdfLib=(typeof window.jspdf!=="undefined")?window.jspdf.jsPDF:jsPDF;
+  var A4W=210,A4H=297,MARGIN=10,CW=190,CH=277,CAPW=794;
+  var doc=new jspdfLib({orientation:"portrait",unit:"mm",format:"a4"});
+  var pageAdded=false;
 
-  var prevContent = document.getElementById("prev-content");
-  var pages = Array.from(prevContent.querySelectorAll(".prev-page"));
-  if(!pages.length){ toast("Aperçu vide","er"); return; }
-
-  var jspdfLib = (typeof window.jspdf !== "undefined") ? window.jspdf.jsPDF : jsPDF;
-  /* A4 en mm */
-  var A4_W = 210, A4_H = 297;
-  var MARGIN = 10; /* 10mm de chaque côté */
-  var CONTENT_W = A4_W - 2*MARGIN;
-  var CONTENT_H = A4_H - 2*MARGIN;
-  /* Largeur de capture en px correspondant à A4 à 96dpi = 794px */
-  var CAPTURE_W = 794;
-
-  var doc = new jspdfLib({ orientation:"portrait", unit:"mm", format:"a4" });
-
-  for(var i=0; i<pages.length; i++){
-    /* Cloner et positionner hors écran mais visible pour html2canvas */
-    var clone = pages[i].cloneNode(true);
-    clone.style.cssText = [
-      "position:fixed",
-      "top:0",
-      "left:-9999px",          /* Hors écran mais pas display:none */
-      "width:" + CAPTURE_W + "px",
-      "min-height:auto",
-      "background:#ffffff",
-      "box-shadow:none",
-      "margin:0",
-      "padding:36px 44px 44px",
-      "box-sizing:border-box",
+  async function captureEl(el){
+    /* Cloner hors-écran à largeur A4 fixe */
+    var clone=el.cloneNode(true);
+    /* Masquer boutons interactifs */
+    clone.querySelectorAll("button,input").forEach(function(b){b.style.display="none";});
+    clone.style.cssText=[
+      "position:fixed","top:0","left:-9999px",
+      "width:"+CAPW+"px","background:#fff",
+      "box-sizing:border-box","padding:16px 20px",
       "font-family:Calibri,Arial,sans-serif",
-      "font-size:10pt",
-      "line-height:1.5",
-      "color:#2d1f0e",
-      "z-index:-9999",
-      "overflow:visible"
+      "font-size:10pt","line-height:1.5","color:#2d1f0e",
+      "z-index:-1","overflow:visible","margin:0"
     ].join(";");
     document.body.appendChild(clone);
+    await new Promise(function(r){setTimeout(r,80);});
+    var canvas=await html2canvas(clone,{
+      scale:2,useCORS:true,allowTaint:true,
+      backgroundColor:"#ffffff",logging:false,
+      width:CAPW,windowWidth:CAPW+100,
+      scrollX:0,scrollY:0,x:0,y:0
+    });
+    document.body.removeChild(clone);
+    return canvas;
+  }
 
-    /* Laisser le DOM se rendre avant la capture */
-    await new Promise(function(res){ setTimeout(res, 120); });
-
-    try{
-      var canvas = await html2canvas(clone, {
-        scale: 2,                    /* 2x pour qualité */
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: "#ffffff",
-        logging: false,
-        width: CAPTURE_W,
-        windowWidth: CAPTURE_W + 100,
-        scrollX: 0,
-        scrollY: 0,
-        x: 0,
-        y: 0
-      });
-
-      /* Dimensions réelles capturées → convertir en mm proportionnellement */
-      var pxW = canvas.width;   /* = CAPTURE_W * 2 (scale 2) */
-      var pxH = canvas.height;
-
-      /* Largeur dans le PDF = CONTENT_W, hauteur proportionnelle */
-      var mmW = CONTENT_W;
-      var mmH = (pxH / pxW) * mmW;
-
-      if(i > 0) doc.addPage();
-
-      /* Si le contenu est plus haut que A4 : on pagine automatiquement */
-      if(mmH <= CONTENT_H){
-        /* Tient sur une page → centrer verticalement */
-        var yTop = MARGIN;
-        doc.addImage(
-          canvas.toDataURL("image/jpeg", 0.92),
-          "JPEG", MARGIN, yTop, mmW, mmH
-        );
-      } else {
-        /* Trop haut → découper en tranches A4 */
-        var pxPerMm = pxW / mmW;
-        var sliceH_px = Math.floor(CONTENT_H * pxPerMm);
-        var offset_px = 0;
-        var first = true;
-
-        while(offset_px < pxH){
-          /* Créer un canvas de la tranche */
-          var sliceCanvas = document.createElement("canvas");
-          sliceCanvas.width  = pxW;
-          sliceCanvas.height = Math.min(sliceH_px, pxH - offset_px);
-          var ctx = sliceCanvas.getContext("2d");
-          ctx.drawImage(canvas, 0, -offset_px);
-
-          var sliceMmH = (sliceCanvas.height / pxW) * mmW;
-
-          if(!first) doc.addPage();
-          first = false;
-
-          doc.addImage(
-            sliceCanvas.toDataURL("image/jpeg", 0.92),
-            "JPEG", MARGIN, MARGIN, mmW, sliceMmH
-          );
-          offset_px += sliceH_px;
-        }
+  async function addCanvasToDoc(canvas){
+    var pxW=canvas.width,pxH=canvas.height;
+    var mmW=CW,mmH=(pxH/pxW)*mmW;
+    if(mmH<=CH){
+      /* Tient sur une page */
+      if(pageAdded)doc.addPage();pageAdded=true;
+      doc.addImage(canvas.toDataURL("image/jpeg",0.88),"JPEG",MARGIN,MARGIN,mmW,mmH);
+    } else {
+      /* Découpe en tranches A4 — chaque tranche = page entière */
+      var pxPerMm=pxW/mmW;
+      var sliceH=Math.floor(CH*pxPerMm);
+      var offset=0;
+      while(offset<pxH){
+        var h=Math.min(sliceH,pxH-offset);
+        var sc=document.createElement("canvas");
+        sc.width=pxW;sc.height=h;
+        sc.getContext("2d").drawImage(canvas,0,-offset);
+        if(pageAdded)doc.addPage();pageAdded=true;
+        var sliceMmH=(h/pxW)*mmW;
+        doc.addImage(sc.toDataURL("image/jpeg",0.88),"JPEG",MARGIN,MARGIN,mmW,sliceMmH);
+        offset+=sliceH;
       }
-    } finally {
-      document.body.removeChild(clone);
     }
   }
 
-  /* Nommer et sauvegarder */
-  var d = (S.ident && S.ident.date) ? S.ident.date : new Date().toISOString().slice(0,10);
-  var n = (S.ident && S.ident.numero) ? "_N"+S.ident.numero : "";
-  var filename = "RJ_Ambassade"+n+"_"+d+".pdf";
+  /* Page 1 : page de garde */
+  var pg1=prevContent.querySelector(".prev-page-1");
+  if(pg1){var cv=await captureEl(pg1);await addCanvasToDoc(cv);}
 
-  var blob = doc.output("blob");
-  var url  = URL.createObjectURL(blob);
-  /* iOS : ouvrir dans un nouvel onglet → Partager → Enregistrer dans Fichiers */
-  var a = document.createElement("a");
-  a.href = url;
-  a.target = "_blank";
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setTimeout(function(){ URL.revokeObjectURL(url); }, 60000);
-  toast("PDF généré ✓ — Appuyer sur Partager pour sauvegarder", "ok");
+  /* Page 2 intro : vue d'ensemble (tout sauf prev-cage) */
+  var pg2=prevContent.querySelector(".prev-page-2");
+  if(pg2){
+    /* Capturer la partie intro (avant le bilan) */
+    var introClone=pg2.cloneNode(true);
+    /* Masquer les .prev-cage dans le clone */
+    introClone.querySelectorAll(".bilan-section").forEach(function(b){b.style.display="none";});
+    introClone.querySelectorAll("button,input").forEach(function(b){b.style.display="none";});
+    if(introClone.textContent.trim()){
+      introClone.style.cssText="position:fixed;top:0;left:-9999px;width:"+CAPW+"px;background:#fff;box-sizing:border-box;padding:16px 20px;font-family:Calibri,Arial,sans-serif;font-size:10pt;line-height:1.5;color:#2d1f0e;z-index:-1;overflow:visible";
+      document.body.appendChild(introClone);
+      await new Promise(function(r){setTimeout(r,80);});
+      var cv2=await html2canvas(introClone,{scale:2,useCORS:true,allowTaint:true,backgroundColor:"#ffffff",logging:false,width:CAPW,windowWidth:CAPW+100,scrollX:0,scrollY:0});
+      document.body.removeChild(introClone);
+      if(cv2.height>10)await addCanvasToDoc(cv2);
+    }
+
+    /* Chaque cage = sa propre page/set de pages */
+    var cages=pg2.querySelectorAll(".prev-cage");
+    for(var ci=0;ci<cages.length;ci++){
+      var cv3=await captureEl(cages[ci]);
+      await addCanvasToDoc(cv3);
+    }
+  }
+
+  /* Télécharger */
+  var d=document.getElementById("fd").value||new Date().toISOString().slice(0,10);
+  var n=document.getElementById("fn").value;
+  var fname="RJ_Ambassade"+(n?"_"+n:"")+"_"+d+".pdf";
+  var blob=doc.output("blob");
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement("a");a.href=url;a.download=fname;a.target="_blank";
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(url);},60000);
+  toast("PDF généré ✓","ok");
 }
+
 function doGenWord(){collectState();showPreview();}
 
 // ─── WORD GENERATION ───
