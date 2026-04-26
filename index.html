@@ -222,7 +222,7 @@ select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.o
 .toast.er{background:var(--re)}.toast.ok{background:var(--vl)}
 
 /* ── APERÇU ── */
-.prev-ov{position:fixed;inset:0;background:rgba(45,31,14,.88);z-index:150;display:none;flex-direction:column}
+.prev-ov{position:fixed;inset:0;background:rgba(45,31,14,.88);z-index:150;display:none;flex-direction:column;-webkit-overflow-scrolling:touch}
 .prev-ov.on{display:flex;animation:fi .2s}
 .prev-bar{display:flex;align-items:center;justify-content:space-between;padding:calc(var(--s3) + var(--safe-t)) var(--s4) var(--s3);background:var(--vf);flex-shrink:0;gap:var(--s3)}
 .prev-bar h2{font-family:Georgia,serif;font-size:16px;margin:0;font-weight:700;color:#fff;white-space:nowrap}
@@ -361,7 +361,7 @@ select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.o
 .prev-meteo-impact{font-size:9pt;color:#8b2e1a;font-style:italic;padding:6px 10px;background:#fdf0ee;border-left:3px solid #8b2e1a;border-radius:0 4px 4px 0;margin-top:6px}
 
 /* ── Cage blocks ── */
-.prev-cage{margin-top:0;page-break-before:always;page-break-inside:avoid}.prev-cage:first-child{page-break-before:auto}.prev-ph-item{page-break-inside:avoid;break-inside:avoid}
+.prev-cage{margin-top:0;break-before:page;page-break-before:always;page-break-inside:avoid;break-inside:avoid}.prev-cage:first-child{break-before:auto;page-break-before:auto}.prev-ph-item{break-inside:avoid;page-break-inside:avoid}.prev-lot-grp{break-inside:avoid;page-break-inside:avoid}.prev-esp{break-inside:avoid;page-break-inside:avoid}.prev-appt-hdr{break-after:avoid;page-break-after:avoid}
 .prev-cage-hdr{color:#fff;font-size:13pt;font-weight:bold;padding:8px 14px;border-radius:6px 6px 0 0;margin-bottom:0;letter-spacing:.02em}
 .prev-appt{margin:0 0 10px;border:1px solid #d8ccb8;border-radius:0 0 6px 6px;overflow:hidden}
 .prev-appt-hdr{background:#ede6d8;padding:6px 12px;font-weight:bold;font-size:10pt;border-bottom:1px solid #d8ccb8;display:flex;align-items:center;gap:6px}
@@ -380,18 +380,16 @@ select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.o
 .prev-tache-note{font-size:8pt;color:#7a4f2d;font-style:italic;margin-left:27px;margin-top:1px}
 
 /* Grille photos aperçu */
-.prev-ph-grid{display:grid;gap:8px;margin-top:8px}
-.prev-ph-grid.n1{grid-template-columns:1fr}
-.prev-ph-grid.n2{grid-template-columns:1fr 1fr}
-.prev-ph-grid.n3{grid-template-columns:1fr 1fr 1fr}
-.prev-ph-item img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;border-radius:4px;border:1px solid #d8ccb8}
+.prev-ph-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}.prev-ph-item{break-inside:avoid;page-break-inside:avoid}.prev-ph-item img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;border-radius:4px;border:1px solid #d8ccb8}
 .prev-ph-cap{font-size:8pt;color:#7a6548;margin-top:3px;line-height:1.3}
 .prev-ph-cap strong{color:#2d1f0e}
+.ph-resize-btn{display:inline-block}
+@media print{.ph-resize-btn{display:none!important}}
 
 /* ── Pied de page ── */
 .prev-footer{margin-top:32px;padding-top:10px;border-top:1px solid #d8ccb8;display:flex;justify-content:space-between;font-size:8pt;color:#7a6548}
 /* Cage block aperçu */
-.prev-cage{margin-top:0;page-break-before:always;break-before:page}.prev-cage:first-child{page-break-before:auto;break-before:auto}.prev-ph-item{page-break-inside:avoid;break-inside:avoid}
+.prev-cage{margin-top:0;break-before:page;page-break-before:always;page-break-inside:avoid;break-inside:avoid}.prev-cage:first-child{break-before:auto;page-break-before:auto}
 .prev-cage-hdr{background:#2d5a3d;color:#fff;font-size:13pt;font-weight:bold;padding:8px 14px;border-radius:6px 6px 0 0;margin-bottom:0}
 .prev-appt-hdr{background:#ede6d8;padding:6px 12px;font-weight:bold;font-size:10pt;color:#2d5a3d;border-bottom:1px solid #d8ccb8}
 .prev-esp-name{font-size:9pt;font-weight:bold;color:#7a4f2d;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
@@ -494,6 +492,48 @@ select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.o
 .pwa-banner-title{font-size:13px;font-weight:700;margin-bottom:2px;}
 .pwa-banner-sub{font-size:11px;color:rgba(255,255,255,.75);line-height:1.4;}
 .pwa-banner-close{background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:50%;width:28px;height:28px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+/* ══════════════════════════════════════
+   APERÇU — RESPONSIVITÉ MOBILE
+   ══════════════════════════════════════ */
+@media(max-width:600px){
+  .prev-bar{flex-wrap:wrap;gap:6px;padding:10px 12px}
+  .prev-bar h2{font-size:13px;flex:1}
+  .prev-bar-btns{display:flex;flex-wrap:wrap;gap:4px;width:100%}
+  .prev-bar-btns .pbtn{flex:1;min-width:0;padding:6px 8px;font-size:10px;text-align:center}
+  .prev-body{padding:10px 8px;overflow-x:hidden}
+  .prev-page{padding:12px 10px!important;margin:0!important;border-radius:0!important;box-shadow:none!important;border:none!important;min-height:auto!important}
+  .prev-page-2{margin-top:10px!important}
+  /* Page de garde compacte */
+  .doc-header{flex-direction:column;gap:8px}
+  .doc-logo-box{width:100%!important;text-align:left}
+  h1{font-size:16px!important}
+  /* Avancement */
+  .prev-av-card{flex-direction:column;gap:6px}
+  .prev-av-item{padding:8px 12px!important}
+  .av-val{font-size:22pt!important}
+  /* Délais contractuels */
+  .prev-contrat-phases{flex-direction:column;gap:6px}
+  .prev-contrat-phase{padding:8px!important}
+  /* Bilan cages */
+  .prev-cage{break-before:auto!important;page-break-before:auto!important;margin-top:16px!important}
+  .prev-cage:first-child{margin-top:0!important}
+  .prev-cage-hdr{font-size:11pt!important;padding:6px 10px!important}
+  .prev-appt-hdr{font-size:10pt!important;padding:4px 10px!important}
+  .prev-esp-name{font-size:9pt!important}
+  /* Grille photos : 2 colonnes sur mobile */
+  .prev-ph-grid{grid-template-columns:repeat(2,1fr)!important;gap:6px!important}
+  .prev-ph-item{grid-column:span 1!important} /* reset span individuel */
+  /* Tableau : scroll */
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;font-size:9pt}
+  th,td{white-space:nowrap;padding:4px 6px!important}
+  /* Lot grille ov */
+  .prev-ov-grid{grid-template-columns:1fr!important}
+}
+@media(max-width:380px){
+  .prev-ph-grid{grid-template-columns:1fr!important}
+  .prev-bar-btns .pbtn{font-size:9px;padding:5px 6px}
+}
 </style>
 </head>
 <body>
@@ -639,12 +679,7 @@ select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.o
     <div class="prev-bar-btns">
       <button class="pbtn cl" onclick="hidePreview()">&#xD7; Fermer</button>
       <button class="pbtn meteo-on" id="btn-toggle-meteo" onclick="toggleMeteoPreview()" title="Afficher/masquer la météo">&#x1F321; Météo</button>
-      <div style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.1);border-radius:8px;padding:3px 6px">
-        <span style="font-size:10px;color:rgba(255,255,255,.6);margin-right:2px">📐</span>
-        <button class="pbtn ph-sz on-sz" id="sz-s" onclick="setPhotoSize('s',this)" title="Petites photos">S</button>
-        <button class="pbtn ph-sz" id="sz-m" onclick="setPhotoSize('m',this)" title="Moyennes">M</button>
-        <button class="pbtn ph-sz" id="sz-l" onclick="setPhotoSize('l',this)" title="Grandes">L</button>
-      </div>
+
       <button class="pbtn pdf" onclick="exportPDF()">&#x1F5A8; PDF</button>
       <button class="pbtn dl" onclick="generateWord()">&#x1F4E5; Word</button>
     </div>
@@ -1013,7 +1048,7 @@ function renderTab(key){
     var apptPhotoCount=S.photos.filter(function(p){return p.cage===key&&p.appt===ap.id;}).length;
     h+="<div class='wi"+(pd.done>0?" has":"")+"' data-appt='"+ap.id+"' data-cage='"+key+"' onclick='selectAppt(this.dataset.cage,this.dataset.appt)'>"
       +"<div class='wi-l'><div class='wi-code'>"+ap.id+"</div>"+(ap.t?"<div class='wi-name'>"+ap.t+"</div>":"")+"</div>"
-      +"<div class='wi-r'><span class='badge "+cls+"'>"+pd.done+"/"+pd.total+"</span><span class='wi-arr'>&#x276F;</span></div></div>";
+      +"<div class='wi-r'>"+(apptPhotoCount>0?"<span class='ph-badge'>📷"+apptPhotoCount+"</span>":"")+"<span class='badge "+cls+"'>"+pd.done+"/"+pd.total+"</span><span class='wi-arr'>&#x276F;</span></div></div>";
   });
   h+="</div></div></div>";panel.innerHTML=h;
 }
@@ -1057,9 +1092,7 @@ function renderWizEspaces(cage,panel){
     var espPhotoCount=S.photos.filter(function(p){return p.cage===cage&&p.appt===appt&&p.esp===esp;}).length;
     h+="<div class='wi"+(done>0?" has":"")+"' data-esp='"+xh(esp)+"' data-c='"+cage+"' onclick='selectEsp(this.dataset.c,this.dataset.esp)'>"
       +"<div class='wi-l'><div class='wi-name'>"+esp+"</div></div>"
-      +"<div class='wi-r'>"
-      +(espPhotoCount>0?"<span class='ph-badge'>📷"+espPhotoCount+"</span>":"")
-      +"<span class='badge "+cls+"'>"+done+"/"+total+"</span>"
+      +"<div class='wi-r'>"+(espPhotoCount>0?"<span class='ph-badge'>📷"+espPhotoCount+"</span>":"")+"<span class='badge "+cls+"'>"+done+"/"+total+"</span>"
       +"<span class='wi-arr'>&#x276F;</span></div></div>";
   });
   h+="</div></div></div>";panel.innerHTML=h;
@@ -1100,10 +1133,12 @@ function renderWizTachesEsp(cage,panel){
       });
       var gid="grp_"+cage.replace(" ","_")+"_"+appt+"_"+xh(esp)+"_"+lotName.replace(/[^a-zA-Z0-9]/g,"_");
       var allDone=lotDone===lotTotal&&lotTotal>0;
+      var lotPhotoCount=S.photos.filter(function(p){return p.cage===cage&&p.appt===appt&&p.esp===esp&&p.lot===lotName;}).length;
       h+="<div class='lot-grp'>"
         +"<div class='lot-grp-hdr' data-gid='"+gid+"' onclick='toggleLotGrp(this.dataset.gid)' style='border-left:3px solid "+lclr+";'>"
         +"<span class='lot-badge' style='background:"+lclr+"22;color:"+lclr+";border:1px solid "+lclr+"55;'>"+lotName+"</span>"
         +"<span class='lot-grp-name'>"+xh(lotName)+"</span>"
+        +(lotPhotoCount>0?"<span class='ph-badge'>📷"+lotPhotoCount+"</span>":"")
         +"<span class='lot-grp-count' style='color:"+(allDone?"var(--vg)":"var(--vm)")+"'>"+lotDone+"/"+lotTotal+"</span>"
         +"<span class='lot-grp-arrow' id='arr_"+gid+"'>&#x276F;</span>"
         +"</div>"
@@ -1120,7 +1155,7 @@ function renderWizTachesEsp(cage,panel){
           +" data-cage='"+cage+"' data-appt='"+appt+"' data-esp='"+xh(esp)+"' data-tkey='"+xh(tkey)+"'"
           +" onchange='setPlanEsp(this)'/>"
           +"<span class='tlbl"+(done?" dk":"")+"'>"+xh(t.tache)+"</span>"
-          +(nc>0?"<span class='ph-badge'>📷"+nc+"</span>":"")
+
           +"<span class='ordre-badge'>"+t.ordre+"</span>"
           +"</div>"
           +"<div class='trow-body'>"
@@ -1594,14 +1629,22 @@ var _photoSize = 's'; /* s=3col, m=2col, l=1col */
 
 /* ═══ I. APERÇU & EXPORT ═══ */
 function setPhotoSize(sz, btn){
-  _photoSize = sz;
-  document.querySelectorAll('.ph-sz').forEach(function(b){ b.classList.remove('on-sz'); });
-  if(btn) btn.classList.add('on-sz');
-  /* Mettre à jour la grille sans reconstruire tout l'aperçu */
-  var colMap = {s:'repeat(3,1fr)', m:'repeat(2,1fr)', l:'1fr'};
-  document.querySelectorAll('#prev-content .prev-ph-grid').forEach(function(g){
-    g.style.gridTemplateColumns = colMap[sz];
-  });
+  /* Conservé pour compatibilité mais plus utilisé en global */
+}
+function cyclePhotoSize(itemId){
+  var item = document.getElementById(itemId);
+  if(!item) return;
+  var grid = item.closest('.prev-ph-grid');
+  if(!grid) return;
+  /* Lire l'état actuel de cet item via colSpan simulé */
+  var cur = item.dataset.szState || '1';
+  var next = cur==='1'?'2':cur==='2'?'3':'1';
+  item.dataset.szState = next;
+  /* Appliquer via grid-column */
+  item.style.gridColumn = next==='1'?'span 1':next==='2'?'span 2':'span 3';
+  /* Tooltip sur le bouton */
+  var btn = item.querySelector('.ph-resize-btn');
+  if(btn) btn.title = next==='1'?'Agrandir (1/3)':next==='2'?'Agrandir (2/3)':'Réduire (3/3)';
 }
 function updatePhotoCaption(photoId, newCaption){
   var p = S.photos.find(function(ph){ return ph.id===photoId; });
@@ -1784,9 +1827,8 @@ function showPreview(){
     var planSt=S.planning[cage]||{};
     var cagePhotos=S.photos.filter(function(p){return p.cage===cage;});
     if(!cagePhotos.length&&!Object.keys(planSt).length)return;
-    var isFirstCage = bilanH.length===0;
     hasBilan=true;
-    bilanH+="<div class='prev-cage'" + (isFirstCage?"":" style='page-break-before:always;break-before:page;margin-top:0'") + ">";
+    bilanH+="<div class='prev-cage'>";
     bilanH+="<div class='prev-cage-hdr' style='background:"+col+"'>"+cfg.label+" &mdash; "+cfg.sub+"</div>";
     bilanH+="<div class='prev-appt'>";
     var appts=cage==="EXT"?["EXT"]:(CAGES[cage]&&CAGES[cage].lg)||[];
@@ -1819,12 +1861,19 @@ function showPreview(){
             var lclr=LOT_CLR[lot]||"#94a3b8";
             bilanH+="<div class='prev-lot-grp'>"
               +"<span class='prev-lot-name' style='background:"+lclr+"22;color:"+lclr+";border:1px solid "+lclr+"55'>"+lot+"</span>";
-            var nc=lps.length,gc=nc<=1?"n1":nc===2?"n2":"n3";
+            var nc=lps.length,gc="n3"; /* 3 colonnes fixes en aperçu/PDF */
             bilanH+="<div class='prev-ph-grid "+gc+"'>";
             lps.forEach(function(p){
               var capId="cap-"+p.id;
               var pid=p.id;
-              bilanH+="<div class='prev-ph-item'><img src='"+p.dataUrl+"' alt=''/>"
+              bilanH+="<div class='prev-ph-item' id='phi-"+pid+"'>"
+                +"<div style='position:relative'>"
+                +"<img src='"+p.dataUrl+"' alt=''/>"
+                +"<button onclick=\"cyclePhotoSize('phi-"+pid+"')\" "
+                +"style='position:absolute;top:3px;right:3px;background:rgba(0,0,0,.55);color:#fff;"
+                +"border:none;border-radius:4px;font-size:9px;padding:2px 5px;cursor:pointer;"
+                +"print-display:none' class='ph-resize-btn' title='Changer taille'>⊕</button>"
+                +"</div>"
                 +"<div class='prev-ph-cap'>"
                 +"<input id='cap-"+pid+"' type='text' value='"+xh(p.tache||p.lot||"")+"' "
                 +"data-pid='"+pid+"' "
@@ -1873,8 +1922,11 @@ function showPreview(){
   });
 
   if(hasBilan){
-    p2+="<div class='sh'><span class='sn'>05</span>Bilan par cage &mdash; T&acirc;ches &amp; Photos</div>";
-    p2+=bilanH;
+    /* Titre bilan sur nouvelle page, chaque cage aussi */
+    p2+="<div style='break-before:page;page-break-before:always;margin-top:0'>"
+      +"<div class='sh' style='margin-top:0'><span class='sn'>05</span>Bilan par cage &mdash; T&acirc;ches &amp; Photos</div>"
+      +bilanH
+      +"</div>";
   }
 
   /* ════════════════════════════════════════════════════════════
