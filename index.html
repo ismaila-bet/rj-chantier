@@ -1443,6 +1443,19 @@ function toggleMeteoPreview(){
   if(ov && ov.classList.contains("on")) showPreview();
 }
 
+
+function delConstatPhoto(photoId, constKey){
+  if(!confirm("Supprimer cette photo de constat ?"))return;
+  /* Retirer des photos globales */
+  S.photos = S.photos.filter(function(p){ return p.id !== photoId; });
+  /* Retirer de photoIds du constat */
+  if(S.constats && S.constats[constKey]){
+    S.constats[constKey].photoIds = (S.constats[constKey].photoIds||[]).filter(function(id){ return id !== photoId; });
+  }
+  saveDraft(true);
+  showPreview(); /* Rafraîchir l'aperçu */
+  toast("Photo supprimée", "ok");
+}
 function showPreview(){
   collectState();
   var ident=S.ident||{},g=(S.gsum&&S.gsum.reelPct)||0,plan=(S.gsum&&S.gsum.planPct)||0,ecart=g-plan;
@@ -1602,45 +1615,14 @@ function showPreview(){
       esps.forEach(function(esp){
         var espPhotos=apptPhotos.filter(function(p){return p.esp===esp;});
         var espPlan=apptPlan[esp]||{};
-        var groups={},groupOrder=[];
-        if(typeof espPlan==="object"){
-          Object.keys(espPlan).forEach(function(tkey){
-            var row=espPlan[tkey];
-            if(!row||(!row.done&&!(row.photoIds&&row.photoIds.length)&&!row.note))return;
-            var parts=tkey.split("_"),lotName=parts[0];
-            if(!groups[lotName]){groups[lotName]=[];groupOrder.push(lotName);}
-            groups[lotName].push({tkey,row});
-          });
-        }
-        var hasContent=espPhotos.length||groupOrder.length;
+        /* Seules les photos comptent pour l'affichage dans l'aperçu */
+        var hasContent=espPhotos.length;
+        /* Vérifier aussi si un constat non-RAS existe */
+        var constKeyChk="CONSTAT_"+cage+"_"+appt+"_"+esp;
+        var constDataChk=S.constats&&S.constats[constKeyChk];
+        if(constDataChk&&constDataChk.statut&&constDataChk.statut!=="RAS")hasContent=true;
         if(!hasContent)return;
         bilanH+="<div class='prev-esp'><div class='prev-esp-name'>"+esp+"</div>";
-        /* Afficher seulement les lots qui ont des photos */
-        if(groupOrder.length){
-          groupOrder.forEach(function(lot){
-            /* Vérifier si ce lot a des photos dans cet espace */
-            var lotPhotos=espPhotos.filter(function(p){return p.lot===lot;});
-            if(!lotPhotos.length)return; /* Skip lot sans photo */
-            var lclr=LOT_CLR[lot]||"#94a3b8";
-            bilanH+="<div class='prev-lot-grp'>"
-              +"<span class='prev-lot-name' style='background:"+lclr+"22;color:"+lclr+";border:1px solid "+lclr+"55'>"+lot+"</span>";
-            groups[lot].forEach(function(item){
-              /* Note visible si la tâche est done ou a une note */
-              if(item.row.done||item.row.note){
-                var icon=item.row.done?"✓":"○";
-                var p2b=item.tkey.split("_"),ordre=p2b[1]||"";
-                var tachePart=item.tkey.replace(p2b[0]+"_"+p2b[1]+"_","");
-                bilanH+="<div class='prev-tache-row'>"
-                  +"<span class='"+(item.row.done?"ck":"pend")+"'>"+icon+"</span>"
-                  +"<span class='prev-tache-order'>"+ordre+"</span>"
-                  +"<span class='"+(item.row.done?"ck":"pend")+"'>"+xh(tachePart)+"</span>"
-                  +"</div>";
-                if(item.row.note)bilanH+="<div class='prev-tache-note'>"+xh(item.row.note)+"</div>";
-              }
-            });
-            bilanH+="</div>";
-          });
-        }
         if(espPhotos.length){
           /* Grouper les photos par lot pour n'afficher que ceux avec photos */
           var photosByLot={};
@@ -1675,7 +1657,13 @@ function showPreview(){
               var cpnc=constPhotos.length,cpgc=cpnc<=1?"n1":cpnc===2?"n2":"n3";
               bilanH+="<div class='prev-constat-ph "+cpgc+"'>";
               constPhotos.forEach(function(p){
-                bilanH+="<img src='"+p.dataUrl+"' alt=''/><div class='prev-constat-ph-cap'>Constat : "+xh(constData.note||"")+"</div>";
+                bilanH+="<div style='position:relative;display:inline-block;width:100%'>";
+                bilanH+="<img src='"+p.dataUrl+"' style='width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:4px;border:1px solid #d8ccb8;display:block;' alt=''/>";
+                bilanH+="<button onclick='delConstatPhoto(\""+p.id+"\",\""+constKeyChk+"\")' ";
+                bilanH+="style='position:absolute;top:4px;right:4px;background:rgba(139,46,26,.85);color:#fff;border:none;";
+                bilanH+="border-radius:50%;width:22px;height:22px;font-size:13px;cursor:pointer;line-height:1;padding:0;'>×</button>";
+                bilanH+="<div class='prev-constat-ph-cap'>"+(constData.note?xh(constData.note):"Constat terrain")+"</div>";
+                bilanH+="</div>";
               });
               bilanH+="</div>";
             }
