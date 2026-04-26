@@ -17,6 +17,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <!-- jsPDF + html2canvas pour export PDF mobile -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root{
@@ -150,6 +151,7 @@ select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.o
 .wi-r{display:flex;align-items:center;gap:var(--s2);flex-shrink:0}
 .badge{font-family:monospace;font-size:10px;padding:3px 9px;border-radius:100px;font-weight:600}
 .badge.done{background:var(--vm);color:var(--vf)}
+.ph-badge{display:inline-flex;align-items:center;gap:2px;padding:1px 6px;border-radius:20px;background:rgba(255,184,0,.15);border:1px solid rgba(255,184,0,.35);color:var(--do);font-size:10px;font-weight:700;line-height:1.4;flex-shrink:0}
 .badge.part{background:var(--dos);color:var(--mr)}
 .badge.zero{background:var(--bg2);color:var(--ink4)}
 .wi-arr{font-size:14px;color:var(--ink4)}
@@ -228,6 +230,8 @@ select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.o
 .pbtn{padding:8px 14px;border-radius:var(--r);border:none;font-family:monospace;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;white-space:nowrap}
 .pbtn.dl{background:var(--do);color:#fff}
 .pbtn.pdf{background:#2d5a3d;color:#fff}
+.pbtn.ph-sz{background:transparent;color:rgba(255,255,255,.5);padding:3px 7px;font-size:11px;border:1px solid transparent;border-radius:6px;min-width:26px}
+.pbtn.ph-sz.on-sz{background:rgba(255,255,255,.2);color:#fff;border-color:rgba(255,255,255,.3)}
 .pbtn.cl{background:rgba(255,255,255,.15);color:#fff}
 /* ── Print / Export PDF ── */
 @media print{
@@ -357,7 +361,7 @@ select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.o
 .prev-meteo-impact{font-size:9pt;color:#8b2e1a;font-style:italic;padding:6px 10px;background:#fdf0ee;border-left:3px solid #8b2e1a;border-radius:0 4px 4px 0;margin-top:6px}
 
 /* ── Cage blocks ── */
-.prev-cage{margin-top:20px;page-break-inside:avoid}
+.prev-cage{margin-top:0;page-break-before:always;page-break-inside:avoid}.prev-cage:first-child{page-break-before:auto}.prev-ph-item{page-break-inside:avoid;break-inside:avoid}
 .prev-cage-hdr{color:#fff;font-size:13pt;font-weight:bold;padding:8px 14px;border-radius:6px 6px 0 0;margin-bottom:0;letter-spacing:.02em}
 .prev-appt{margin:0 0 10px;border:1px solid #d8ccb8;border-radius:0 0 6px 6px;overflow:hidden}
 .prev-appt-hdr{background:#ede6d8;padding:6px 12px;font-weight:bold;font-size:10pt;border-bottom:1px solid #d8ccb8;display:flex;align-items:center;gap:6px}
@@ -387,21 +391,12 @@ select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.o
 /* ── Pied de page ── */
 .prev-footer{margin-top:32px;padding-top:10px;border-top:1px solid #d8ccb8;display:flex;justify-content:space-between;font-size:8pt;color:#7a6548}
 /* Cage block aperçu */
-.prev-cage{margin-top:20px}
+.prev-cage{margin-top:0;page-break-before:always;break-before:page}.prev-cage:first-child{page-break-before:auto;break-before:auto}.prev-ph-item{page-break-inside:avoid;break-inside:avoid}
 .prev-cage-hdr{background:#2d5a3d;color:#fff;font-size:13pt;font-weight:bold;padding:8px 14px;border-radius:6px 6px 0 0;margin-bottom:0}
-.prev-appt{margin:0 0 10px;border:1px solid #d8ccb8;border-radius:0 0 6px 6px;overflow:hidden}
 .prev-appt-hdr{background:#ede6d8;padding:6px 12px;font-weight:bold;font-size:10pt;color:#2d5a3d;border-bottom:1px solid #d8ccb8}
-.prev-esp{padding:8px 12px;border-bottom:1px solid #f0ebe0}
-.prev-esp:last-child{border-bottom:none}
 .prev-esp-name{font-size:9pt;font-weight:bold;color:#7a4f2d;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
-/* Grille photos aperçu */
 .prev-ph-grid{display:grid;gap:8px}
-.prev-ph-grid.n1{grid-template-columns:1fr}
-.prev-ph-grid.n2{grid-template-columns:1fr 1fr}
-.prev-ph-grid.n3{grid-template-columns:1fr 1fr 1fr}
-.prev-ph-item img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;border-radius:4px;border:1px solid #d8ccb8}
 .prev-ph-cap{font-size:8.5pt;color:#7a6548;margin-top:3px;line-height:1.3}
-.prev-ph-cap strong{color:#2d1f0e}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 .lot-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;white-space:nowrap;font-family:var(--fm);letter-spacing:.04em;flex-shrink:0;}
 .ordre-badge{font-family:var(--fm);font-size:9px;color:var(--vm);background:rgba(255,255,255,.07);border-radius:4px;padding:1px 5px;flex-shrink:0;margin-left:auto;}
@@ -439,7 +434,6 @@ select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.o
 /* ── Accordéon lot-grp ── */
 .lot-grp{margin-bottom:4px;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,.07);}
 .lot-grp-hdr{display:flex;align-items:center;gap:8px;padding:9px 12px;cursor:pointer;background:rgba(255,255,255,.04);transition:background .15s;user-select:none;}
-.lot-grp-hdr:hover{background:rgba(255,255,255,.07);}
 .lot-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;white-space:nowrap;flex-shrink:0;letter-spacing:.04em;}
 .lot-grp-name{font-size:11px;font-weight:600;color:var(--vt);flex:1;}
 .lot-grp-count{font-family:var(--fm);font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(255,255,255,.07);color:var(--vm);flex-shrink:0;}
@@ -447,7 +441,6 @@ select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.o
 .lot-grp-arrow{font-size:10px;color:var(--vm);flex-shrink:0;transition:transform .2s;display:inline-block;}
 .lot-grp-body{display:none;border-top:1px solid rgba(255,255,255,.06);}
 .ordre-badge{font-family:var(--fm);font-size:9px;color:var(--vm);background:rgba(255,255,255,.07);border-radius:4px;padding:1px 5px;flex-shrink:0;}
-.wiz-type{font-family:var(--fm);font-size:9px;padding:2px 8px;border-radius:20px;margin-left:auto;background:rgba(193,127,58,.12);border:1px solid rgba(193,127,58,.3);color:#c17f3a;}
 
 /* ── Cartes cage dans l'aperçu (copie fidèle de .cc) ── */
 .prev-ov-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
@@ -624,6 +617,8 @@ select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.o
   <button class="btn btn-s" onclick="importJSON()" title="Importer sauvegarde JSON">&#x1F4E5; Import</button>
   <button class="btn btn-s" onclick="showPreview()">&#x1F441; Aper&ccedil;u</button>
   <button class="btn btn-p" onclick="doGenWord()">&#x1F4DD; Word</button>
+  <button class="btn btn-s" onclick="downloadAllPhotos()" title="Télécharger toutes les photos">&#x1F4F7; Photos</button>
+  <button class="btn btn-s btn-danger" onclick="deleteAllPhotos()" title="Supprimer toutes les photos" style="background:rgba(139,46,26,.15);border-color:rgba(139,46,26,.4);color:#8b2e1a">&#x1F5D1; Vider photos</button>
 </div></div>
 <!-- Input caché pour l'import JSON -->
 <input type="file" id="json-import-input" accept=".json" style="display:none" onchange="handleImportJSON(this)"/>
@@ -644,6 +639,12 @@ select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.o
     <div class="prev-bar-btns">
       <button class="pbtn cl" onclick="hidePreview()">&#xD7; Fermer</button>
       <button class="pbtn meteo-on" id="btn-toggle-meteo" onclick="toggleMeteoPreview()" title="Afficher/masquer la météo">&#x1F321; Météo</button>
+      <div style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.1);border-radius:8px;padding:3px 6px">
+        <span style="font-size:10px;color:rgba(255,255,255,.6);margin-right:2px">📐</span>
+        <button class="pbtn ph-sz on-sz" id="sz-s" onclick="setPhotoSize('s',this)" title="Petites photos">S</button>
+        <button class="pbtn ph-sz" id="sz-m" onclick="setPhotoSize('m',this)" title="Moyennes">M</button>
+        <button class="pbtn ph-sz" id="sz-l" onclick="setPhotoSize('l',this)" title="Grandes">L</button>
+      </div>
       <button class="pbtn pdf" onclick="exportPDF()">&#x1F5A8; PDF</button>
       <button class="pbtn dl" onclick="generateWord()">&#x1F4E5; Word</button>
     </div>
@@ -670,9 +671,19 @@ select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.o
     <div class="ph-input-area">
       <label for="pfi" class="ph-drop" id="ph-drop">
         <span class="ic">&#x1F4F7;</span>
-        <span id="ph-lbl">Prendre la photo</span>
+        <span id="ph-lbl">Appuyer pour choisir</span>
       </label>
-      <input type="file" id="pfi" accept="image/*" capture="environment"/>
+      <!-- Deux inputs séparés : caméra et galerie -->
+      <input type="file" id="pfi" accept="image/*" capture="environment" style="display:none"/>
+      <input type="file" id="pfi-gallery" accept="image/*" style="display:none"/>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:8px;justify-content:center">
+      <button type="button" class="btn btn-s" onclick="document.getElementById('pfi').click()" style="flex:1">
+        📷 Caméra
+      </button>
+      <button type="button" class="btn btn-s" onclick="document.getElementById('pfi-gallery').click()" style="flex:1">
+        🖼 Galerie
+      </button>
     </div>
     <div class="fi" style="margin-top:12px"><label>Commentaire</label><textarea id="pco" placeholder="Observation, anomalie..."></textarea></div>
     <div class="mac">
@@ -683,7 +694,12 @@ select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.o
 </div>
 
 <script>
+/* ╔══════════════════════════════════════════════════════════╗
+   ║  RAPPORT JOURNALIER — Ambassade de France MP & TS Ph.2  ║
+   ║  Version optimisée — BET Suivi Chantier                  ║
+   ╚══════════════════════════════════════════════════════════╝ */
 
+/* ═══ A. CONSTANTES & DONNÉES ═══ */
 /* ══════════════════════════════════════════════════
    PWA — Icône Apple Touch + Manifeste
    ══════════════════════════════════════════════════ */
@@ -759,7 +775,7 @@ const MP14_ZONES=["Global","Séjour","Chambre 1","Chambre 2","Cuisine","SDE","To
 const MP15_DATA={"Global":[{lot:"ELEC",ordre:1.0,tache:"Dépose et évacuation électricité existante"},{lot:"MEN ALU",ordre:1.0,tache:"Dépose menuiserie alu"},{lot:"MEN BOIS",ordre:1.0,tache:"Dépose menuiserie bois"},{lot:"PLOMBERIE",ordre:1.0,tache:"Dépose et évacuation plomberie"},{lot:"MAÇONNERIE",ordre:3.1,tache:"Démolitions et évacuations (gaine et Paillasse cuisine)"},{lot:"MAÇONNERIE",ordre:3.2,tache:"Cloisonnements intérieurs (Gaine)"},{lot:"ELEC",ordre:4.1,tache:"Pose Chemin de câbles"},{lot:"ETANCHEITE",ordre:5.4,tache:"Test mise en eau étanchéité"},{lot:"MAÇONNERIE",ordre:6.0,tache:"Enduits et finitions"},{lot:"FAUX PLAFOND",ordre:7.15,tache:"Pose Faux plafond"},{lot:"ELEC",ordre:8.5,tache:"Pose et câblage compteur monophasé SENELEC"},{lot:"ELEC",ordre:8.6,tache:"Pose et câblage coffret général"},{lot:"Nettoyage",ordre:11.0,tache:"Essais et nettoyage zone de travail"}],"Séjour":[{lot:"CLIM",ordre:2.1,tache:"Dépose et évacuation (UE, UI, Réseaux)"},{lot:"CLIM",ordre:2.2,tache:"Réservation en voile (Frigo, élec, condensats)"},{lot:"ELEC",ordre:4.2,tache:"Saignées et fourreautage (Luminaire, Prise, Fibre, TV)"},{lot:"ELEC",ordre:4.5,tache:"Filerie (Tirage des câbles)"},{lot:"CARRELAGE",ordre:7.1,tache:"Pose du revêtement dur sur sol et murs"},{lot:"FAUX PLAFOND",ordre:7.15,tache:"Pose de faux plafonds en BA13"},{lot:"MEN ALU",ordre:7.3,tache:"Pose menuiserie alu intérieure"},{lot:"VMC",ordre:7.3,tache:"Pose entrées d'air en menuiseries"},{lot:"PEINT 1",ordre:7.5,tache:"Peinture intérieur 1ère couche"},{lot:"CLIM",ordre:7.6,tache:"Pose bouche attente réseau frigo"},{lot:"ELEC",ordre:8.1,tache:"Pose et câblage Prise, Luminaire, Interrupteur, V&V"},{lot:"ELEC",ordre:8.2,tache:"Pose et câblage Ventilateur plafond"},{lot:"PEINT 3",ordre:9.0,tache:"Peinture intérieur finition"}],"Chambre 1":[{lot:"CLIM",ordre:2.1,tache:"Dépose et évacuation (UE, UI, Réseaux)"},{lot:"CLIM",ordre:2.2,tache:"Réservation en voile (Frigo, élec, condensats)"},{lot:"ELEC",ordre:4.2,tache:"Saignées et fourreautage (Luminaire, Prise, Fibre, TV)"},{lot:"ELEC",ordre:4.5,tache:"Filerie (Tirage des câbles)"},{lot:"CLIM",ordre:5.3,tache:"Pose tuyaux condensat"},{lot:"CARRELAGE",ordre:7.1,tache:"Pose du revêtement dur sur sol et murs"},{lot:"FAUX PLAFOND",ordre:7.15,tache:"Pose de faux plafonds en BA13"},{lot:"MEN BOIS",ordre:7.2,tache:"Pose menuiserie intérieure, placard"},{lot:"MEN ALU",ordre:7.3,tache:"Pose menuiserie alu intérieure"},{lot:"VMC",ordre:7.3,tache:"Pose entrées d'air en menuiseries"},{lot:"PEINT 1",ordre:7.5,tache:"Peinture intérieur 1ère couche"},{lot:"CLIM",ordre:7.6,tache:"Pose bouche attente réseau frigo"},{lot:"ELEC",ordre:8.1,tache:"Pose et câblage Prise, Luminaire, Interrupteur, V&V"},{lot:"ELEC",ordre:8.2,tache:"Pose et câblage Ventilateur plafond"},{lot:"PEINT 3",ordre:9.0,tache:"Peinture intérieur finition"}],"Chambre 2":[{lot:"CLIM",ordre:2.1,tache:"Dépose et évacuation (UE, UI, Réseaux)"},{lot:"CLIM",ordre:2.2,tache:"Réservation en voile (Frigo, élec, condensats)"},{lot:"ELEC",ordre:4.2,tache:"Saignées et fourreautage (Luminaire, Prise, Fibre, TV)"},{lot:"ELEC",ordre:4.5,tache:"Filerie (Tirage des câbles)"},{lot:"CLIM",ordre:5.3,tache:"Pose tuyaux condensat"},{lot:"CARRELAGE",ordre:7.1,tache:"Pose du revêtement dur sur sol et murs"},{lot:"FAUX PLAFOND",ordre:7.15,tache:"Pose de faux plafonds en BA13"},{lot:"MEN BOIS",ordre:7.2,tache:"Pose menuiserie intérieure, placard"},{lot:"MEN ALU",ordre:7.3,tache:"Pose menuiserie alu intérieure"},{lot:"VMC",ordre:7.3,tache:"Pose entrées d'air en menuiseries"},{lot:"PEINT 1",ordre:7.5,tache:"Peinture intérieur 1ère couche"},{lot:"CLIM",ordre:7.6,tache:"Pose bouche attente réseau frigo"},{lot:"ELEC",ordre:8.1,tache:"Pose et câblage Prise, Luminaire, Interrupteur, V&V"},{lot:"ELEC",ordre:8.2,tache:"Pose et câblage Ventilateur plafond"},{lot:"PEINT 3",ordre:9.0,tache:"Peinture intérieur finition"}],"Cuisine":[{lot:"ELEC",ordre:4.3,tache:"Saignées et fourreautage (Zone humide - Luminaire, Prise)"},{lot:"ELEC",ordre:4.6,tache:"Filerie (Tirage des câbles)"},{lot:"PLOMBERIE",ordre:5.1,tache:"Pose tuyauterie évacuation (Ø 32 à 110)"},{lot:"VMC",ordre:5.2,tache:"Pose Gaine circulaire acier galva"},{lot:"PLOMBERIE",ordre:5.5,tache:"Pose nourrices en coffret & Multicouche"},{lot:"PLOMBERIE",ordre:5.6,tache:"Pose tube distribution multicouche (Pexalu)"},{lot:"CARRELAGE",ordre:7.1,tache:"Pose du revêtement dur sur sol et murs"},{lot:"FAUX PLAFOND",ordre:7.15,tache:"Pose de faux plafonds en BA13"},{lot:"MEN BOIS",ordre:7.2,tache:"Pose menuiserie intérieure, placard"},{lot:"MEN ALU",ordre:7.3,tache:"Pose menuiserie alu intérieure"},{lot:"PEINT 1",ordre:7.5,tache:"Peinture intérieur 1ère couche"},{lot:"PLOMBERIE",ordre:7.6,tache:"Pose et raccordement (Évier, Lave-linge, Ballon EC)"},{lot:"PLOMBERIE",ordre:7.61,tache:"Pose équipement gaz (Cuivre, détendeur, flexible)"},{lot:"VMC",ordre:7.7,tache:"Pose bouche d'extraction"},{lot:"ELEC",ordre:8.3,tache:"Pose et câblage Prise, Luminaire, interrupteur et DAAF"},{lot:"PEINT 3",ordre:9.0,tache:"Peinture intérieur finition"}],"SDE 1":[{lot:"ELEC",ordre:4.4,tache:"Saignées et fourreautage (Zone humide - Luminaire, Prise)"},{lot:"ELEC",ordre:4.7,tache:"Filerie (Tirage des câbles)"},{lot:"PLOMBERIE",ordre:5.1,tache:"Pose tuyauterie évacuation (Ø 32 à 125)"},{lot:"VMC",ordre:5.2,tache:"Pose Gaine circulaire acier galva"},{lot:"ETANCHEITE",ordre:5.4,tache:"Pose étanchéité"},{lot:"PLOMBERIE",ordre:5.5,tache:"Pose nourrices en coffret & Multicouche"},{lot:"PLOMBERIE",ordre:5.6,tache:"Pose tube distribution multicouche (Pexalu)"},{lot:"CARRELAGE",ordre:7.1,tache:"Pose du revêtement dur sur sol et murs"},{lot:"FAUX PLAFOND",ordre:7.15,tache:"Pose de faux plafonds en BA13"},{lot:"PEINT 1",ordre:7.5,tache:"Peinture intérieur 1ère couche"},{lot:"PLOMBERIE",ordre:7.6,tache:"Pose et raccordement (Douche, WC, Lavabo)"},{lot:"VMC",ordre:7.7,tache:"Pose bouche d'extraction"},{lot:"ELEC",ordre:8.4,tache:"Pose et câblage Luminaire étanche, interrupteur et Prise"},{lot:"PEINT 3",ordre:9.0,tache:"Peinture intérieur finition"},{lot:"PLOMBERIE",ordre:10.0,tache:"Désinfection, Essais et Nettoyage final"}],"SDE 2":[{lot:"ELEC",ordre:4.4,tache:"Saignées et fourreautage (Zone humide - Luminaire, Prise)"},{lot:"ELEC",ordre:4.7,tache:"Filerie (Tirage des câbles)"},{lot:"PLOMBERIE",ordre:5.1,tache:"Pose tuyauterie évacuation (Ø 32 à 125)"},{lot:"VMC",ordre:5.2,tache:"Pose Gaine circulaire acier galva"},{lot:"ETANCHEITE",ordre:5.4,tache:"Pose étanchéité"},{lot:"PLOMBERIE",ordre:5.5,tache:"Pose nourrices en coffret & Multicouche"},{lot:"CARRELAGE",ordre:7.1,tache:"Pose du revêtement dur sur sol et murs"},{lot:"FAUX PLAFOND",ordre:7.15,tache:"Pose de faux plafonds en BA13"},{lot:"PEINT 1",ordre:7.5,tache:"Peinture intérieur 1ère couche"},{lot:"PLOMBERIE",ordre:7.6,tache:"Pose et raccordement (Douche, WC, Lavabo)"},{lot:"VMC",ordre:7.7,tache:"Pose bouche d'extraction"},{lot:"ELEC",ordre:8.4,tache:"Pose et câblage Luminaire étanche, interrupteur et Prise"},{lot:"PEINT 3",ordre:9.0,tache:"Peinture intérieur finition"}],"Toil. Visiteur":[{lot:"ELEC",ordre:4.4,tache:"Saignées et fourreautage (Zone humide - Luminaire)"},{lot:"ELEC",ordre:4.7,tache:"Filerie (Tirage des câbles)"},{lot:"PLOMBERIE",ordre:5.1,tache:"Pose tuyauterie évacuation (Ø 32 à 125)"},{lot:"VMC",ordre:5.2,tache:"Pose Gaine circulaire acier galva"},{lot:"ETANCHEITE",ordre:5.4,tache:"Pose étanchéité"},{lot:"PLOMBERIE",ordre:5.5,tache:"Pose nourrices en coffret & Multicouche"},{lot:"PLOMBERIE",ordre:5.6,tache:"Pose tube distribution multicouche (Pexalu)"},{lot:"CARRELAGE",ordre:7.1,tache:"Pose du revêtement dur sur sol et murs"},{lot:"FAUX PLAFOND",ordre:7.15,tache:"Pose de faux plafonds en BA13"},{lot:"PEINT 1",ordre:7.5,tache:"Peinture intérieur 1ère couche"},{lot:"PLOMBERIE",ordre:7.6,tache:"Pose et raccordement (WC)"},{lot:"VMC",ordre:7.7,tache:"Pose bouche d'extraction"},{lot:"ELEC",ordre:8.4,tache:"Pose et câblage Luminaire étanche, interrupteur et Prise"},{lot:"PEINT 3",ordre:9.0,tache:"Peinture intérieur finition"}],"Couloirs":[{lot:"ELEC",ordre:4.4,tache:"Saignées et fourreautage (Zone humide - Luminaire)"},{lot:"ELEC",ordre:4.7,tache:"Filerie (Tirage des câbles)"},{lot:"CARRELAGE",ordre:7.1,tache:"Pose du revêtement dur sur sol et murs"},{lot:"FAUX PLAFOND",ordre:7.15,tache:"Pose de faux plafonds en BA13"},{lot:"PEINT 1",ordre:7.5,tache:"Peinture intérieur 1ère couche"},{lot:"ELEC",ordre:8.1,tache:"Pose et câblage Prise, Luminaire, Interrupteur"},{lot:"PEINT 3",ordre:9.0,tache:"Peinture intérieur finition"}],"Loggia":[{lot:"ELEC",ordre:4.4,tache:"Saignées et fourreautage (Zone humide - Luminaire)"},{lot:"ELEC",ordre:4.7,tache:"Filerie (Tirage des câbles)"},{lot:"ETANCHEITE",ordre:5.4,tache:"Pose étanchéité"},{lot:"CARRELAGE",ordre:7.1,tache:"Pose du revêtement dur sur sol et murs"},{lot:"PLOMBERIE",ordre:7.6,tache:"Pose et raccordement (siphon de sol)"},{lot:"ELEC",ordre:8.4,tache:"Pose et câblage Luminaire étanche, interrupteur et Prise"}],"Balcon":[{lot:"ELEC",ordre:4.4,tache:"Saignées et fourreautage (Zone humide - Luminaire)"},{lot:"ELEC",ordre:4.7,tache:"Filerie (Tirage des câbles)"},{lot:"PLOMBERIE",ordre:5.1,tache:"Pose tuyauterie évacuation (Ø 32 à 110)"},{lot:"ETANCHEITE",ordre:5.4,tache:"Pose étanchéité"},{lot:"CARRELAGE",ordre:7.1,tache:"Pose du revêtement dur sur sol et murs"},{lot:"PLOMBERIE",ordre:7.6,tache:"Pose et raccordement (siphon de sol)"},{lot:"ELEC",ordre:8.4,tache:"Pose et câblage Luminaire étanche, interrupteur et Prise"}]};
 const MP15_ZONES=["Global","Séjour","Chambre 1","Chambre 2","Cuisine","SDE 1","SDE 2","Toil. Visiteur","Couloirs","Loggia","Balcon"];
 
-/* MP4 / MP42 / MP43 : Studio */
+/* MP4 / MP43 : Studio */
 const MP4_DATA={"Global":[{lot:"ELEC",ordre:1.0,tache:"Dépose et évacuation électricité existante"},{lot:"PLOMBERIE",ordre:1.0,tache:"Dépose et évacuation plomberie"},{lot:"MEN BOIS",ordre:1.0,tache:"Dépose menuiserie bois"},{lot:"MEN ALU",ordre:1.0,tache:"Dépose menuiserie alu"},{lot:"MAÇONNERIE",ordre:3.1,tache:"Démolitions et évacuations"},{lot:"MAÇONNERIE",ordre:3.2,tache:"Cloisonnements intérieurs"},{lot:"MAÇONNERIE",ordre:3.3,tache:"Enduits et finitions"},{lot:"ELEC",ordre:4.1,tache:"Pose Chemin de câbles"},{lot:"FAUX PLAFOND",ordre:7.2,tache:"Pose Faux plafond"},{lot:"ELEC",ordre:7.3,tache:"Pose et câblage compteur monophasé SENELEC"},{lot:"ELEC",ordre:7.31,tache:"Pose et câblage coffret général"},{lot:"Nettoyage",ordre:9.0,tache:"Essais et nettoyage zone de travail"}],"Chambre-Séjour":[{lot:"CLIM",ordre:2.1,tache:"Dépose et évacuation (UE, UI, Réseaux)"},{lot:"CLIM",ordre:2.2,tache:"Réservation en voile (Frigo, élec, condensats)"},{lot:"ELEC",ordre:4.2,tache:"Saignées et fourreautage (Luminaire, Prise, Fibre, TV)"},{lot:"ELEC",ordre:4.5,tache:"Filerie (Tirage des câbles)"},{lot:"CLIM",ordre:5.6,tache:"Pose tuyaux condensat"},{lot:"CARRELAGE",ordre:7.1,tache:"Pose du revêtement dur sur sol et murs"},{lot:"MEN BOIS",ordre:7.4,tache:"Pose menuiserie intérieure, placard"},{lot:"MEN ALU",ordre:7.5,tache:"Pose menuiserie intérieure"},{lot:"PEINT 1",ordre:7.51,tache:"Peinture intérieur 1ère couche"},{lot:"CLIM",ordre:7.6,tache:"Pose bouche attente réseau frigo"},{lot:"VMC",ordre:7.7,tache:"Pose entrées d'air en menuiseries"},{lot:"ELEC",ordre:8.1,tache:"Pose et câblage Prise, Luminaire, Interrupteur, V&V"},{lot:"ELEC",ordre:8.2,tache:"Pose et câblage Ventilateur plafond"},{lot:"PEINT 3",ordre:9.0,tache:"Peinture intérieur finition"}],"Cuisine":[{lot:"ELEC",ordre:4.3,tache:"Saignées et fourreautage (Zone humide - Luminaire, Prise)"},{lot:"ELEC",ordre:4.6,tache:"Filerie (Tirage des câbles)"},{lot:"PLOMBERIE",ordre:5.1,tache:"Pose tube distribution multicouche (Pexalu)"},{lot:"PLOMBERIE",ordre:5.2,tache:"Pose tuyauterie évacuation (Ø 32 à 110)"},{lot:"VMC",ordre:5.4,tache:"Pose Gaine circulaire acier galva"},{lot:"PLOMBERIE",ordre:5.7,tache:"Pose nourrices en coffret & Multicouche"},{lot:"CARRELAGE",ordre:7.1,tache:"Pose du revêtement dur sur sol et murs"},{lot:"MEN BOIS",ordre:7.4,tache:"Pose menuiserie intérieure cuisine"},{lot:"MEN ALU",ordre:7.5,tache:"Pose menuiserie intérieure"},{lot:"PEINT 1",ordre:7.51,tache:"Peinture intérieur 1ère couche"},{lot:"PLOMBERIE",ordre:7.6,tache:"Pose et raccordement (Évier, Lave-linge)"},{lot:"PLOMBERIE",ordre:7.61,tache:"Pose équipement gaz (Cuivre, détendeur, flexible)"},{lot:"VMC",ordre:7.7,tache:"Pose bouche d'extraction"},{lot:"ELEC",ordre:7.9,tache:"Pose et câblage Prise, Luminaire, DAAF"},{lot:"PEINT 3",ordre:8.0,tache:"Peinture intérieur finition"}],"SDE":[{lot:"ELEC",ordre:4.4,tache:"Saignées et fourreautage (Zone humide - Luminaire, Prise)"},{lot:"ELEC",ordre:4.7,tache:"Filerie (Tirage des câbles)"},{lot:"PLOMBERIE",ordre:5.1,tache:"Pose tuyauterie évacuation (Ø 32 à 125)"},{lot:"ETANCHEITE",ordre:5.3,tache:"Pose étanchéité SDE"},{lot:"VMC",ordre:5.5,tache:"Pose Gaine circulaire acier galva"},{lot:"PLOMBERIE",ordre:5.8,tache:"Pose nourrices en coffret & Multicouche"},{lot:"PLOMBERIE",ordre:5.9,tache:"Pose tube distribution multicouche (Pexalu)"},{lot:"CARRELAGE",ordre:7.1,tache:"Pose du revêtement dur sur sol et murs"},{lot:"MEN ALU",ordre:7.5,tache:"Pose menuiserie intérieure"},{lot:"PEINT 1",ordre:7.51,tache:"Peinture intérieur 1ère couche"},{lot:"PLOMBERIE",ordre:7.6,tache:"Pose et raccordement (Ballon EC, Douche, WC, Lavabo)"},{lot:"VMC",ordre:7.7,tache:"Pose bouche d'extraction"},{lot:"ELEC",ordre:8.4,tache:"Pose et câblage Luminaire étanche et Prise"},{lot:"PEINT 3",ordre:8.0,tache:"Peinture intérieur finition"},{lot:"PLOMBERIE",ordre:9.0,tache:"Désinfection, Essais et Nettoyage final"}]};
 const MP4_ZONES=["Global","Chambre-Séjour","Cuisine","SDE"];
 
@@ -779,7 +795,7 @@ const MP3_ZONES=["Global","Chambre-Séjour","Cuisine","SDE"];
 const MP11_DATA={"Global":[{lot:"ELEC",ordre:1.0,tache:"Dépose et évacuation électricité existante"},{lot:"MEN ALU",ordre:1.0,tache:"Dépose menuiserie alu"},{lot:"MEN BOIS",ordre:1.0,tache:"Dépose menuiserie bois"},{lot:"PLOMBERIE",ordre:1.0,tache:"Dépose et évacuation plomberie"},{lot:"MAÇONNERIE",ordre:3.1,tache:"Démolitions et évacuations (gaine et Paillasse cuisine)"},{lot:"MAÇONNERIE",ordre:3.2,tache:"Cloisonnements intérieurs (Gaine)"},{lot:"ELEC",ordre:4.1,tache:"Pose Chemin de câbles"},{lot:"ETANCHEITE",ordre:5.4,tache:"Test mise en eau étanchéité"},{lot:"MAÇONNERIE",ordre:6.0,tache:"Enduits et finitions"},{lot:"FAUX PLAFOND",ordre:7.15,tache:"Pose Faux plafond"},{lot:"ELEC",ordre:8.5,tache:"Pose et câblage compteur monophasé SENELEC"},{lot:"ELEC",ordre:8.6,tache:"Pose et câblage coffret général"},{lot:"Nettoyage",ordre:11.0,tache:"Essais et nettoyage zone de travail"}],"Séjour":[{lot:"CLIM",ordre:2.1,tache:"Dépose et évacuation (UE, UI, Réseaux)"},{lot:"CLIM",ordre:2.2,tache:"Réservation en voile"},{lot:"ELEC",ordre:4.2,tache:"Saignées et fourreautage (Luminaire, Prise, Fibre, TV)"},{lot:"ELEC",ordre:4.5,tache:"Filerie (Tirage des câbles)"},{lot:"CARRELAGE",ordre:7.1,tache:"Pose du revêtement dur sur sol et murs"},{lot:"FAUX PLAFOND",ordre:7.15,tache:"Pose Faux plafond BA13"},{lot:"MEN ALU",ordre:7.3,tache:"Pose menuiserie alu intérieure"},{lot:"PEINT 1",ordre:7.5,tache:"Peinture intérieur 1ère couche"},{lot:"CLIM",ordre:7.6,tache:"Pose bouche attente réseau frigo"},{lot:"ELEC",ordre:8.1,tache:"Pose et câblage Prise, Luminaire, Interrupteur, V&V"},{lot:"ELEC",ordre:8.2,tache:"Pose et câblage Ventilateur plafond"},{lot:"PEINT 3",ordre:9.0,tache:"Peinture intérieur finition"}],"Chambre 1":[{lot:"CLIM",ordre:2.1,tache:"Dépose et évacuation (UE, UI, Réseaux)"},{lot:"CLIM",ordre:2.2,tache:"Réservation en voile"},{lot:"ELEC",ordre:4.2,tache:"Saignées et fourreautage (Luminaire, Prise, Fibre, TV)"},{lot:"ELEC",ordre:4.5,tache:"Filerie (Tirage des câbles)"},{lot:"CLIM",ordre:5.3,tache:"Pose tuyaux condensat"},{lot:"CARRELAGE",ordre:7.1,tache:"Pose du revêtement dur sur sol et murs"},{lot:"FAUX PLAFOND",ordre:7.15,tache:"Pose Faux plafond BA13"},{lot:"MEN BOIS",ordre:7.2,tache:"Pose menuiserie intérieure, placard"},{lot:"MEN ALU",ordre:7.3,tache:"Pose menuiserie alu intérieure"},{lot:"VMC",ordre:7.3,tache:"Pose entrées d'air en menuiseries"},{lot:"PEINT 1",ordre:7.5,tache:"Peinture intérieur 1ère couche"},{lot:"CLIM",ordre:7.6,tache:"Pose bouche attente réseau frigo"},{lot:"ELEC",ordre:8.1,tache:"Pose et câblage Prise, Luminaire, Interrupteur, V&V"},{lot:"PEINT 3",ordre:9.0,tache:"Peinture intérieur finition"}],"Chambre 2":[{lot:"CLIM",ordre:2.1,tache:"Dépose et évacuation (UE, UI, Réseaux)"},{lot:"CLIM",ordre:2.2,tache:"Réservation en voile"},{lot:"ELEC",ordre:4.2,tache:"Saignées et fourreautage (Luminaire, Prise, Fibre, TV)"},{lot:"ELEC",ordre:4.5,tache:"Filerie (Tirage des câbles)"},{lot:"CLIM",ordre:5.3,tache:"Pose tuyaux condensat"},{lot:"CARRELAGE",ordre:7.1,tache:"Pose du revêtement dur sur sol et murs"},{lot:"FAUX PLAFOND",ordre:7.15,tache:"Pose Faux plafond BA13"},{lot:"MEN ALU",ordre:7.3,tache:"Pose menuiserie alu intérieure"},{lot:"VMC",ordre:7.3,tache:"Pose entrées d'air en menuiseries"},{lot:"PEINT 1",ordre:7.5,tache:"Peinture intérieur 1ère couche"},{lot:"CLIM",ordre:7.6,tache:"Pose bouche attente réseau frigo"},{lot:"ELEC",ordre:8.1,tache:"Pose et câblage Prise, Luminaire, Interrupteur, V&V"},{lot:"PEINT 3",ordre:9.0,tache:"Peinture intérieur finition"}],"Chambre 3":[{lot:"CLIM",ordre:2.1,tache:"Dépose et évacuation (UE, UI, Réseaux)"},{lot:"CLIM",ordre:2.2,tache:"Réservation en voile"},{lot:"ELEC",ordre:4.2,tache:"Saignées et fourreautage (Luminaire, Prise, Fibre, TV)"},{lot:"ELEC",ordre:4.5,tache:"Filerie (Tirage des câbles)"},{lot:"CLIM",ordre:5.3,tache:"Pose tuyaux condensat"},{lot:"CARRELAGE",ordre:7.1,tache:"Pose du revêtement dur sur sol et murs"},{lot:"FAUX PLAFOND",ordre:7.15,tache:"Pose Faux plafond BA13"},{lot:"MEN ALU",ordre:7.3,tache:"Pose menuiserie alu intérieure"},{lot:"PEINT 1",ordre:7.5,tache:"Peinture intérieur 1ère couche"},{lot:"CLIM",ordre:7.6,tache:"Pose bouche attente réseau frigo"},{lot:"ELEC",ordre:8.1,tache:"Pose et câblage Prise, Luminaire, Interrupteur, V&V"},{lot:"PEINT 3",ordre:9.0,tache:"Peinture intérieur finition"}],"Cuisine":[{lot:"ELEC",ordre:4.3,tache:"Saignées et fourreautage (Zone humide - Luminaire, Prise)"},{lot:"ELEC",ordre:4.6,tache:"Filerie (Tirage des câbles)"},{lot:"PLOMBERIE",ordre:5.1,tache:"Pose tuyauterie évacuation (Ø 32 à 110)"},{lot:"VMC",ordre:5.2,tache:"Pose Gaine circulaire acier galva"},{lot:"PLOMBERIE",ordre:5.5,tache:"Pose nourrices en coffret & Multicouche"},{lot:"PLOMBERIE",ordre:5.6,tache:"Pose tube distribution multicouche (Pexalu)"},{lot:"CARRELAGE",ordre:7.1,tache:"Pose du revêtement dur sur sol et murs"},{lot:"FAUX PLAFOND",ordre:7.15,tache:"Pose Faux plafond BA13"},{lot:"MEN BOIS",ordre:7.2,tache:"Pose menuiserie intérieure, placard"},{lot:"MEN ALU",ordre:7.3,tache:"Pose menuiserie alu intérieure"},{lot:"PEINT 1",ordre:7.5,tache:"Peinture intérieur 1ère couche"},{lot:"PLOMBERIE",ordre:7.6,tache:"Pose et raccordement (Évier, Lave-linge, Ballon EC)"},{lot:"PLOMBERIE",ordre:7.61,tache:"Pose équipement gaz"},{lot:"VMC",ordre:7.7,tache:"Pose bouche d'extraction"},{lot:"ELEC",ordre:8.3,tache:"Pose et câblage Prise, Luminaire, interrupteur et DAAF"},{lot:"PEINT 3",ordre:9.0,tache:"Peinture intérieur finition"}],"SDE 1":[{lot:"ELEC",ordre:4.4,tache:"Saignées et fourreautage (Zone humide - Luminaire, Prise)"},{lot:"ELEC",ordre:4.7,tache:"Filerie (Tirage des câbles)"},{lot:"PLOMBERIE",ordre:5.1,tache:"Pose tuyauterie évacuation (Ø 32 à 125)"},{lot:"VMC",ordre:5.2,tache:"Pose Gaine circulaire acier galva"},{lot:"ETANCHEITE",ordre:5.4,tache:"Pose étanchéité"},{lot:"PLOMBERIE",ordre:5.5,tache:"Pose nourrices en coffret & Multicouche"},{lot:"PLOMBERIE",ordre:5.6,tache:"Pose tube distribution multicouche (Pexalu)"},{lot:"CARRELAGE",ordre:7.1,tache:"Pose du revêtement dur sur sol et murs"},{lot:"FAUX PLAFOND",ordre:7.15,tache:"Pose Faux plafond BA13"},{lot:"PEINT 1",ordre:7.5,tache:"Peinture intérieur 1ère couche"},{lot:"PLOMBERIE",ordre:7.6,tache:"Pose et raccordement (Douche, WC, Lavabo)"},{lot:"VMC",ordre:7.7,tache:"Pose bouche d'extraction"},{lot:"ELEC",ordre:8.4,tache:"Pose et câblage Luminaire étanche, interrupteur et Prise"},{lot:"PEINT 3",ordre:9.0,tache:"Peinture intérieur finition"},{lot:"PLOMBERIE",ordre:10.0,tache:"Désinfection, Essais et Nettoyage final"}],"SDE 2":[{lot:"ELEC",ordre:4.4,tache:"Saignées et fourreautage (Zone humide - Luminaire, Prise)"},{lot:"ELEC",ordre:4.7,tache:"Filerie (Tirage des câbles)"},{lot:"PLOMBERIE",ordre:5.1,tache:"Pose tuyauterie évacuation (Ø 32 à 125)"},{lot:"VMC",ordre:5.2,tache:"Pose Gaine circulaire acier galva"},{lot:"ETANCHEITE",ordre:5.4,tache:"Pose étanchéité"},{lot:"PLOMBERIE",ordre:5.5,tache:"Pose nourrices en coffret & Multicouche"},{lot:"PLOMBERIE",ordre:5.6,tache:"Pose tube distribution multicouche (Pexalu)"},{lot:"CARRELAGE",ordre:7.1,tache:"Pose du revêtement dur sur sol et murs"},{lot:"FAUX PLAFOND",ordre:7.15,tache:"Pose Faux plafond BA13"},{lot:"PEINT 1",ordre:7.5,tache:"Peinture intérieur 1ère couche"},{lot:"PLOMBERIE",ordre:7.6,tache:"Pose et raccordement (Douche, WC, Lavabo)"},{lot:"VMC",ordre:7.7,tache:"Pose bouche d'extraction"},{lot:"ELEC",ordre:8.4,tache:"Pose et câblage Luminaire étanche, interrupteur et Prise"},{lot:"PEINT 3",ordre:9.0,tache:"Peinture intérieur finition"}],"Toil. Visiteur":[{lot:"ELEC",ordre:4.4,tache:"Saignées et fourreautage (Zone humide - Luminaire)"},{lot:"ELEC",ordre:4.7,tache:"Filerie (Tirage des câbles)"},{lot:"PLOMBERIE",ordre:5.1,tache:"Pose tuyauterie évacuation (Ø 32 à 125)"},{lot:"VMC",ordre:5.2,tache:"Pose Gaine circulaire acier galva"},{lot:"ETANCHEITE",ordre:5.4,tache:"Pose étanchéité"},{lot:"PLOMBERIE",ordre:5.5,tache:"Pose nourrices en coffret & Multicouche"},{lot:"PLOMBERIE",ordre:5.6,tache:"Pose tube distribution multicouche (Pexalu)"},{lot:"CARRELAGE",ordre:7.1,tache:"Pose du revêtement dur sur sol et murs"},{lot:"FAUX PLAFOND",ordre:7.15,tache:"Pose Faux plafond BA13"},{lot:"PEINT 1",ordre:7.5,tache:"Peinture intérieur 1ère couche"},{lot:"PLOMBERIE",ordre:7.6,tache:"Pose et raccordement (WC)"},{lot:"VMC",ordre:7.7,tache:"Pose bouche d'extraction"},{lot:"ELEC",ordre:8.4,tache:"Pose et câblage Luminaire étanche, interrupteur et Prise"},{lot:"PEINT 3",ordre:9.0,tache:"Peinture intérieur finition"}],"Couloirs":[{lot:"ELEC",ordre:4.4,tache:"Saignées et fourreautage (Zone humide - Luminaire)"},{lot:"ELEC",ordre:4.7,tache:"Filerie (Tirage des câbles)"},{lot:"CARRELAGE",ordre:7.1,tache:"Pose du revêtement dur sur sol et murs"},{lot:"PEINT 1",ordre:7.5,tache:"Peinture intérieur 1ère couche"}],"Loggia":[{lot:"ELEC",ordre:4.4,tache:"Saignées et fourreautage (Zone humide - Luminaire)"},{lot:"ELEC",ordre:4.7,tache:"Filerie (Tirage des câbles)"},{lot:"ETANCHEITE",ordre:5.4,tache:"Pose étanchéité"},{lot:"CARRELAGE",ordre:7.1,tache:"Pose du revêtement dur sur sol et murs"},{lot:"PLOMBERIE",ordre:7.6,tache:"Pose et raccordement (siphon de sol)"},{lot:"ELEC",ordre:8.4,tache:"Pose et câblage Luminaire étanche, interrupteur et Prise"}],"Balcon 1":[{lot:"ELEC",ordre:4.4,tache:"Saignées et fourreautage (Zone humide - Luminaire)"},{lot:"ELEC",ordre:4.7,tache:"Filerie (Tirage des câbles)"},{lot:"PLOMBERIE",ordre:5.1,tache:"Pose tuyauterie évacuation (Ø 32 à 110)"},{lot:"ETANCHEITE",ordre:5.4,tache:"Pose étanchéité"},{lot:"CARRELAGE",ordre:7.1,tache:"Pose du revêtement dur sur sol et murs"},{lot:"PLOMBERIE",ordre:7.6,tache:"Pose et raccordement (siphon de sol)"},{lot:"ELEC",ordre:8.4,tache:"Pose et câblage Luminaire étanche, interrupteur et Prise"}],"Balcon 2":[{lot:"ELEC",ordre:4.4,tache:"Saignées et fourreautage (Zone humide - Luminaire)"},{lot:"ELEC",ordre:4.7,tache:"Filerie (Tirage des câbles)"},{lot:"PLOMBERIE",ordre:5.1,tache:"Pose tuyauterie évacuation (Ø 32 à 110)"},{lot:"ETANCHEITE",ordre:5.4,tache:"Pose étanchéité"},{lot:"CARRELAGE",ordre:7.1,tache:"Pose du revêtement dur sur sol et murs"},{lot:"PLOMBERIE",ordre:7.6,tache:"Pose et raccordement (siphon de sol)"},{lot:"ELEC",ordre:8.4,tache:"Pose et câblage Luminaire étanche, interrupteur et Prise"}]};
 const MP11_ZONES=["Global","Séjour","Chambre 1","Chambre 2","Chambre 3","Cuisine","SDE 1","SDE 2","Toil. Visiteur","Couloirs","Loggia","Balcon 1","Balcon 2"];
 
-/* MP41 : F2C ESC 1 */
+/* MP41 : F2 ESC 1 */
 const MP41_DATA={"Global":[{lot:"ELEC",ordre:1.0,tache:"Dépose et évacuation électricité existante"},{lot:"PLOMBERIE",ordre:1.0,tache:"Dépose et évacuation plomberie"},{lot:"MEN BOIS",ordre:1.0,tache:"Dépose menuiserie bois"},{lot:"MEN ALU",ordre:1.0,tache:"Dépose menuiserie alu"},{lot:"MAÇONNERIE",ordre:3.1,tache:"Démolitions et évacuations"},{lot:"MAÇONNERIE",ordre:3.2,tache:"Cloisonnements intérieurs"},{lot:"MAÇONNERIE",ordre:6.0,tache:"Enduits et finitions"},{lot:"FAUX PLAFOND",ordre:7.2,tache:"Pose Faux plafond"},{lot:"ELEC",ordre:9.6,tache:"Pose et câblage compteur monophasé SENELEC"},{lot:"ELEC",ordre:9.61,tache:"Pose et câblage coffret général"},{lot:"Nettoyage",ordre:12.2,tache:"Essais et nettoyage zone de travail"}],"Chambre-Séjour":[{lot:"CLIM",ordre:2.1,tache:"Dépose et évacuation (UE, UI, Réseaux)"},{lot:"CLIM",ordre:2.2,tache:"Réservation en voile"},{lot:"ELEC",ordre:4.2,tache:"Saignées et fourreautage (Luminaire, Prise, Fibre, TV)"},{lot:"ELEC",ordre:4.5,tache:"Filerie (Tirage des câbles)"},{lot:"CLIM",ordre:5.6,tache:"Pose tuyaux condensat"},{lot:"CARRELAGE",ordre:7.1,tache:"Pose du revêtement dur sur sol et murs"},{lot:"CLIM",ordre:7.3,tache:"Pose bouche attente réseau frigo"},{lot:"VMC",ordre:8.1,tache:"Pose entrées d'air en menuiseries"},{lot:"PEINT 1",ordre:8.4,tache:"Peinture intérieur 1ère couche"},{lot:"ELEC",ordre:9.1,tache:"Pose et câblage Prise, Luminaire, Interrupteur, V&V"},{lot:"MEN ALU",ordre:10.3,tache:"Pose menuiserie intérieure"},{lot:"PEINT 3",ordre:11.5,tache:"Peinture intérieur finition"}],"Séjour":[{lot:"CLIM",ordre:2.1,tache:"Dépose et évacuation (UE, UI, Réseaux)"},{lot:"CLIM",ordre:2.2,tache:"Réservation en voile"},{lot:"ELEC",ordre:4.2,tache:"Saignées et fourreautage (Luminaire, Prise, Fibre, TV)"},{lot:"ELEC",ordre:4.5,tache:"Filerie (Tirage des câbles)"},{lot:"CLIM",ordre:5.6,tache:"Pose tuyaux condensat"},{lot:"CARRELAGE",ordre:7.1,tache:"Pose du revêtement dur sur sol et murs"},{lot:"CLIM",ordre:7.3,tache:"Pose bouche attente réseau frigo"},{lot:"VMC",ordre:8.1,tache:"Pose entrées d'air en menuiseries"},{lot:"PEINT 1",ordre:8.4,tache:"Peinture intérieur 1ère couche"},{lot:"ELEC",ordre:9.2,tache:"Pose et câblage Prise, Luminaire, Interrupteur, V&V"},{lot:"ELEC",ordre:9.3,tache:"Pose et câblage Ventilateur plafond"},{lot:"MEN ALU",ordre:10.2,tache:"Pose menuiserie intérieure"},{lot:"PEINT 3",ordre:11.4,tache:"Peinture intérieur finition"}],"Cuisine":[{lot:"ELEC",ordre:4.3,tache:"Saignées et fourreautage (Zone humide - Luminaire, Prise)"},{lot:"ELEC",ordre:4.6,tache:"Filerie (Tirage des câbles)"},{lot:"PLOMBERIE",ordre:5.2,tache:"Pose tuyauterie évacuation (Ø 32 à 110)"},{lot:"VMC",ordre:5.4,tache:"Pose Gaine circulaire acier galva"},{lot:"PLOMBERIE",ordre:5.7,tache:"Pose nourrices en coffret & Multicouche"},{lot:"CARRELAGE",ordre:7.1,tache:"Pose du revêtement dur sur sol et murs"},{lot:"PEINT 1",ordre:8.4,tache:"Peinture intérieur 1ère couche"},{lot:"ELEC",ordre:9.5,tache:"Pose et câblage Prise, Luminaire, DAAF"},{lot:"MEN BOIS",ordre:10.1,tache:"Pose menuiserie intérieure cuisine"},{lot:"MEN ALU",ordre:10.4,tache:"Pose menuiserie intérieure"},{lot:"VMC",ordre:10.6,tache:"Pose bouche d'extraction"},{lot:"PLOMBERIE",ordre:11.1,tache:"Pose équipement gaz"},{lot:"PLOMBERIE",ordre:11.2,tache:"Pose et raccordement (Évier, Lave-linge)"},{lot:"PEINT 3",ordre:11.6,tache:"Peinture intérieur finition"}],"SDE":[{lot:"ELEC",ordre:4.4,tache:"Saignées et fourreautage (Zone humide - Luminaire, Prise)"},{lot:"ELEC",ordre:4.7,tache:"Filerie (Tirage des câbles)"},{lot:"PLOMBERIE",ordre:5.1,tache:"Pose tuyauterie évacuation (Ø 32 à 125)"},{lot:"ETANCHEITE",ordre:5.3,tache:"Pose étanchéité SDE"},{lot:"VMC",ordre:5.5,tache:"Pose Gaine circulaire acier galva"},{lot:"PLOMBERIE",ordre:5.7,tache:"Pose nourrices en coffret & Multicouche"},{lot:"CARRELAGE",ordre:7.1,tache:"Pose du revêtement dur sur sol et murs"},{lot:"PEINT 1",ordre:8.4,tache:"Peinture intérieur 1ère couche"},{lot:"ELEC",ordre:9.4,tache:"Pose et câblage Luminaire étanche et Prise"},{lot:"MEN ALU",ordre:10.5,tache:"Pose menuiserie intérieure"},{lot:"VMC",ordre:10.7,tache:"Pose bouche d'extraction"},{lot:"PLOMBERIE",ordre:11.3,tache:"Pose et raccordement (Ballon EC, Douche, WC, Lavabo)"},{lot:"PEINT 3",ordre:11.7,tache:"Peinture intérieur finition"},{lot:"PLOMBERIE",ordre:12.1,tache:"Désinfection, Essais et Nettoyage final"}]};
 const MP41_ZONES=["Global","Chambre-Séjour","Séjour","Cuisine","SDE"];
 
@@ -803,43 +819,78 @@ const APPT_REGISTRY={
   "MP3": {type:"Studio3",cage:"ESC 3"},
   "MP43":{type:"Studio", cage:"ESC 3"},
   "MP44":{type:"F2B",    cage:"ESC 3"},
-  "MP11":{type:"F4ESC1", cage:"ESC 1"},
-  "MP21":{type:"F4ESC1", cage:"ESC 1"},
-  "MP31":{type:"F4ESC1", cage:"ESC 1"},
-  "MP41":{type:"F2C",    cage:"ESC 1"},
-  "MP42":{type:"Studio", cage:"ESC 1"},
-  "MP1": {type:"Studio3",cage:"ESC 1"},
-  "MP12":{type:"F4ESC1", cage:"ESC 2"},
-  "MP22":{type:"F4ESC1", cage:"ESC 2"},
-  "MP32":{type:"F4ESC1", cage:"ESC 2"},
+  "MP11":{type:"F4", cage:"ESC 1"},
+  "MP21":{type:"F4", cage:"ESC 1"},
+  "MP31":{type:"F4", cage:"ESC 1"},
+  "MP41":{type:"F2", cage:"ESC 1"},
+    "MP1": {type:"Studio3",cage:"ESC 1"},
+  "MP12":{type:"F4", cage:"ESC 2"},
+  "MP22":{type:"F4", cage:"ESC 2"},
+  "MP32":{type:"F4", cage:"ESC 2"},
   "MP2": {type:"Studio3",cage:"ESC 2"},
 };
 
+/* ── Données LOT 01B GROS OEUVRE EXTERIEUR (identique structure appartements) ── */
+const EXT_TACHES = [
+  "Rangement cours et organisation",
+  "Depose des bordures",
+  "Demolitions trottoirs et evacuations",
+  "Demolitions bancs et stockage dalles",
+  "Evacuations des gravats",
+  "Implantations topographiques",
+  "Pose de nouvelles bordures",
+  "Mise en oeuvre dallage jardin",
+  "Revetement coquille sur dallage",
+  "Pose paves autobloquants",
+  "Construction abri surpresseur",
+  "Paillasse maconnee",
+  "Engazonnement et plantations",
+  "Pergola en bois"
+];
+/* Structure zones : chaque tâche est une zone, contient 1 tâche LOT 01B */
+const EXT_ZONES = EXT_TACHES.slice();
+const EXT_DATA = (function(){
+  var d = {};
+  EXT_TACHES.forEach(function(tache, i){
+    d[tache] = [{
+      lot:"LOT 01B", ordre: i+1,
+      tache: tache,
+      pct:0, alertNiveau:"RAS", alertComment:""
+    }];
+  });
+  return d;
+})();
+function getExtData(){ return {data:EXT_DATA, zones:EXT_ZONES, type:"LOT 01B"}; }
+
 function getApptData(nm){
-  var r=APPT_REGISTRY[nm];if(!r)return{data:{Global:[]},zones:["Global"]};
-  var t=r.type;
-  if(t==="F3"  )return{data:MP14_DATA,zones:MP14_ZONES};
-  if(t==="F3B" )return{data:MP15_DATA,zones:MP15_ZONES};
-  if(t==="Studio")return{data:MP4_DATA, zones:MP4_ZONES};
-  if(t==="F2"  )return{data:MP45_DATA,zones:MP45_ZONES};
-  if(t==="F4"  )return{data:MP13_DATA,zones:MP13_ZONES};
-  if(t==="Studio3")return{data:MP3_DATA, zones:MP3_ZONES};
-  if(t==="F4ESC1")return{data:MP11_DATA,zones:MP11_ZONES};
-  if(t==="F2C" )return{data:MP41_DATA,zones:MP41_ZONES};
-  if(t==="F2B" )return{data:MP44_DATA,zones:MP44_ZONES};
-  return{data:{Global:[]},zones:["Global"]};
+  if(nm==="EXT") return getExtData();
+  var r=APPT_REGISTRY[nm];
+  if(!r) return{data:{Global:[]},zones:["Global"]};
+  var map={
+    "F3":{data:MP14_DATA,zones:MP14_ZONES},
+    "F3B":{data:MP15_DATA,zones:MP15_ZONES},
+    "Studio":{data:MP4_DATA,zones:MP4_ZONES},
+    "Studio3":{data:MP3_DATA,zones:MP3_ZONES},
+    "F2":{data:MP45_DATA,zones:MP45_ZONES},
+    "F4":{data:MP13_DATA,zones:MP13_ZONES},
+    "F2B":{data:MP44_DATA,zones:MP44_ZONES}
+  };
+  return map[r.type]||{data:{Global:[]},zones:["Global"]};
 }
 
 /* Couleurs par lot */
 const LOT_CLR={"MAÇONNERIE":"#00ffa3","ELEC":"#ffb800","PLOMBERIE":"#38bdf8","VMC":"#c084fc","ETANCHEITE":"#22d3ee","CARRELAGE":"#fb923c","MEN ALU":"#a78bfa","MEN BOIS":"#f472b6","FAUX PLAFOND":"#94a3b8","PEINT 1":"#fbbf24","PEINT 3":"#f59e0b","CLIM":"#67e8f9","Nettoyage":"#6b7280"};
 
-const CAGES={"ESC 1":{lg:["MP11","MP21","MP31","MP41","MP1","MP42"]},"ESC 2":{lg:["MP12","MP22","MP32","MP2"]},"ESC 3":{lg:["MP3","MP13","MP23","MP33","MP43","MP44"]},"ESC 9":{lg:["MP4","MP14","MP24","MP34","MP15","MP25","MP35","MP45"]}};
-const LOTS={"LOT 01A":"Gros oeuvre int.","LOT 01B":"Gros oeuvre ext.","LOT 02":"Etancheite","LOT 03":"Carrelage","LOT 04":"CVC/Plomberie","LOT 05":"Electricite","LOT 06":"Peinture","LOT 07":"Faux plafond","LOT 08":"Menuiserie bois","LOT 09":"Menuiserie alu","LOT 10":"Stores bannes"};
-const CCF={"ESC 1":{col:"#2d5a3d",label:"ESC 1",sub:"6 logements",lots:["LOT 01A","LOT 03","LOT 04","LOT 05","LOT 06","LOT 07","LOT 08"]},"ESC 2":{col:"#7a4f2d",label:"ESC 2",sub:"4 logements",lots:["LOT 01A","LOT 03","LOT 04","LOT 05","LOT 06","LOT 07","LOT 08"]},"ESC 3":{col:"#4a6fa0",label:"ESC 3",sub:"6 logements",lots:["LOT 01A","LOT 03","LOT 04","LOT 05","LOT 06","LOT 07","LOT 08"]},"ESC 9":{col:"#8b5a1a",label:"ESC 9",sub:"8 logements",lots:["LOT 01A","LOT 03","LOT 04","LOT 05","LOT 06","LOT 07","LOT 08"]},"EXT":{col:"#5a4a6e",label:"Exterieur",sub:"Parties communes",lots:["LOT 01B","LOT 02","LOT 09","LOT 10"]}};
+const CAGES={"ESC 1":{lg:["MP11","MP21","MP31","MP41","MP1"]},"ESC 2":{lg:["MP12","MP22","MP32","MP2"]},"ESC 3":{lg:["MP3","MP13","MP23","MP33","MP43","MP44"]},"ESC 9":{lg:["MP4","MP14","MP24","MP34","MP15","MP25","MP35","MP45"]}};
+const LOTS={"LOT 01A":"Gros oeuvre int.","LOT 01B":"LOT 01B : GROS OEUVRE EXTERIEUR","LOT 02":"Etancheite","LOT 03":"Carrelage","LOT 04":"CVC/Plomberie","LOT 05":"Electricite","LOT 06":"Peinture","LOT 07":"Faux plafond","LOT 08":"Menuiserie bois","LOT 09":"Menuiserie alu","LOT 10":"Stores bannes"};
+const CCF={"ESC 1":{col:"#2d5a3d",label:"ESC 1",sub:"6 logements",lots:["LOT 01A","LOT 02","LOT 03","LOT 04","LOT 05","LOT 06","LOT 07","LOT 08"]},"ESC 2":{col:"#7a4f2d",label:"ESC 2",sub:"4 logements",lots:["LOT 01A","LOT 02","LOT 03","LOT 04","LOT 05","LOT 06","LOT 07","LOT 08"]},"ESC 3":{col:"#4a6fa0",label:"ESC 3",sub:"6 logements",lots:["LOT 01A","LOT 02","LOT 03","LOT 04","LOT 05","LOT 06","LOT 07","LOT 08"]},"ESC 9":{col:"#8b5a1a",label:"ESC 9",sub:"8 logements",lots:["LOT 01A","LOT 02","LOT 03","LOT 04","LOT 05","LOT 06","LOT 07","LOT 08"]},"EXT":{col:"#5a4a6e",label:"Exterieur",sub:"Parties communes",lots:["LOT 01B","LOT 02","LOT 09","LOT 10"]}};
 const TABS=["ESC 1","ESC 2","ESC 3","ESC 9","EXT"];
 const SK="rj_v10";
 
 function lotName(c){return LOTS[c]||c;}
+
+
+/* ═══ E. CALCULS ═══ */
 function calcCageAvg(k){var cfg=CCF[k];if(!cfg)return 0;var av=S.avancement[k]||{},tw=0,tv=0;cfg.lots.forEach(function(c){var w=LOT_WEIGHTS[c]||1;tw+=w;tv+=(av[c]||0)*w;});return tw?Math.round(tv/tw):0;}
 function calcGlobalAvg(){var tw=0,tv=0;TABS.forEach(function(k){var cfg=CCF[k];if(!cfg)return;var av=S.avancement[k]||{};cfg.lots.forEach(function(c){var w=LOT_WEIGHTS[c]||1;tw+=w;tv+=(av[c]||0)*w;});});return tw?Math.round(tv/tw):0;}
 
@@ -850,11 +901,27 @@ let _phCtx=null;
 let S={ident:{},meteo:{cond:""},gsum:{start:"",end:"",planPct:0},avancement:{"ESC 1":{},"ESC 2":{},"ESC 3":{},"ESC 9":{},"EXT":{}},planning:{},photos:[],constats:{}};
 
 // ─── INIT ───
+
+
+/* ═══ F. UI PRINCIPALE ═══ */
 function initUI(){
   document.getElementById("fd").value=new Date().toISOString().slice(0,10);
   document.querySelectorAll(".wc").forEach(function(c){c.addEventListener("click",function(){document.querySelectorAll(".wc").forEach(function(x){x.classList.remove("on");});c.classList.add("on");S.meteo.cond=c.dataset.w;saveDraft(true);});});
   ["fd","fn"].forEach(function(id){document.getElementById(id).addEventListener("input",updStamp);});
   document.getElementById("pfi").addEventListener("change",handleFile);
+  document.getElementById("pfi-gallery").addEventListener("change",function(e){
+    /* Synchroniser avec pfi pour que addPhoto() lise le bon fichier */
+    handleFile(e);
+    /* Copier le fichier dans pfi via DataTransfer si possible */
+    try{
+      var dt=new DataTransfer();
+      dt.items.add(e.target.files[0]);
+      document.getElementById("pfi").files=dt.files;
+    }catch(ex){
+      /* Fallback : stocker le file dans _pendingFile */
+      window._pendingFile=e.target.files[0];
+    }
+  });
   loadDraft();updStamp();renderOv();initTabs();updateGsum();showPWABanner();
 }
 function updStamp(){
@@ -910,6 +977,9 @@ function updAv(el){var c=el.dataset.cage,lc=el.dataset.lc;if(!S.avancement[c])S.
 function closeMoAv(){document.getElementById("mo-av").classList.remove("on");renderOv();updateGsum();TABS.forEach(renderTab);saveDraft(true);}
 
 // ─── TABS ───
+
+
+/* ═══ G. WIZARD BILAN ═══ */
 function initTabs(){
   var nav=document.getElementById("tnav"),cont=document.getElementById("tcont");
   nav.innerHTML=TABS.map(function(k){var act=k===_tab,cfg=CCF[k];return "<button class='tbtn"+(act?" on":"")+"' style='"+(act?"border-bottom-color:"+cfg.col+";color:"+cfg.col:"")+"' data-k='"+k+"' onclick='switchTab(this.dataset.k)'>"+cfg.label+"</button>";}).join("");
@@ -940,6 +1010,7 @@ function renderTab(key){
   var h="<div class='wiz'><div class='wiz-hdr'><span class='wiz-crumb'><strong>"+cfg.label+"</strong> — Choisir un logement</span></div><div class='wiz-body'><div class='wiz-list'>";
   appts.forEach(function(ap){
     var pd=apptProgress(key,ap.id),cls=pd.done===0?"zero":pd.done===pd.total?"done":"part";
+    var apptPhotoCount=S.photos.filter(function(p){return p.cage===key&&p.appt===ap.id;}).length;
     h+="<div class='wi"+(pd.done>0?" has":"")+"' data-appt='"+ap.id+"' data-cage='"+key+"' onclick='selectAppt(this.dataset.cage,this.dataset.appt)'>"
       +"<div class='wi-l'><div class='wi-code'>"+ap.id+"</div>"+(ap.t?"<div class='wi-name'>"+ap.t+"</div>":"")+"</div>"
       +"<div class='wi-r'><span class='badge "+cls+"'>"+pd.done+"/"+pd.total+"</span><span class='wi-arr'>&#x276F;</span></div></div>";
@@ -950,10 +1021,7 @@ function renderTab(key){
 function apptProgress(cage,appt){
   var planSt=((S.planning[cage]||{})[appt])||{};
   var done=0,total=0;
-  if(appt==="EXT"){
-    Object.keys(planSt).forEach(function(esp){Object.keys(planSt[esp]||{}).forEach(function(lot){Object.keys(planSt[esp][lot]||{}).forEach(function(t){total++;if((planSt[esp][lot][t]||{}).done)done++;});});});
-    return{done,total};
-  }
+  /* EXT utilise maintenant la même logique que les autres appts via getApptData */
   var apd=getApptData(appt);
   (apd.zones||[]).forEach(function(esp){
     var espTaches=(apd.data[esp]||[]);
@@ -972,9 +1040,8 @@ function renderWizEspaces(cage,panel){
   var appt=_wiz.appt,cfg=CCF[cage];
   var planSt=((S.planning[cage]||{})[appt])||{};
   var esps;
-  if(appt==="EXT"){esps=["Facade","Hall entree","Cage escalier","Paliers","Toiture"];}
-  else{var apd=getApptData(appt);esps=apd.zones||[];}
-  var apd2=appt==="EXT"?null:getApptData(appt);
+  var apd=getApptData(appt);esps=apd.zones||[];
+  var apd2=apd;
   var h="<div class='wiz'><div class='wiz-hdr'><button class='wiz-back' data-c='"+cage+"' onclick='_wiz.appt=null;renderTab(this.dataset.c)'>&#x276E;</button><span class='wiz-crumb'><strong>"+appt+"</strong> — Espace</span></div><div class='wiz-body'><div class='wiz-list'>";
   esps.forEach(function(esp){
     var done=0,total=0;
@@ -987,9 +1054,13 @@ function renderWizEspaces(cage,panel){
       });
     }
     var cls=done===0?"zero":done===total&&total>0?"done":"part";
+    var espPhotoCount=S.photos.filter(function(p){return p.cage===cage&&p.appt===appt&&p.esp===esp;}).length;
     h+="<div class='wi"+(done>0?" has":"")+"' data-esp='"+xh(esp)+"' data-c='"+cage+"' onclick='selectEsp(this.dataset.c,this.dataset.esp)'>"
       +"<div class='wi-l'><div class='wi-name'>"+esp+"</div></div>"
-      +"<div class='wi-r'><span class='badge "+cls+"'>"+done+"/"+total+"</span><span class='wi-arr'>&#x276F;</span></div></div>";
+      +"<div class='wi-r'>"
+      +(espPhotoCount>0?"<span class='ph-badge'>📷"+espPhotoCount+"</span>":"")
+      +"<span class='badge "+cls+"'>"+done+"/"+total+"</span>"
+      +"<span class='wi-arr'>&#x276F;</span></div></div>";
   });
   h+="</div></div></div>";panel.innerHTML=h;
 }
@@ -1007,7 +1078,7 @@ function renderWizTachesEsp(cage,panel){
 
   var h="<div class='wiz'><div class='wiz-hdr'><button class='wiz-back' data-c='"+cage+"' onclick='_wiz.esp=null;renderTab(this.dataset.c)'>&#x276E;</button>"
     +"<span class='wiz-crumb'><strong>"+appt+"</strong> / "+esp+"</span>"
-    +"<span class='wiz-type'>"+APPT_REGISTRY[appt].type+"</span>"
+    +(APPT_REGISTRY[appt]?"<span class='wiz-type'>"+APPT_REGISTRY[appt].type+"</span>":"")
     +"</div><div class='wiz-body'>";
 
   if(!taches.length){
@@ -1049,6 +1120,7 @@ function renderWizTachesEsp(cage,panel){
           +" data-cage='"+cage+"' data-appt='"+appt+"' data-esp='"+xh(esp)+"' data-tkey='"+xh(tkey)+"'"
           +" onchange='setPlanEsp(this)'/>"
           +"<span class='tlbl"+(done?" dk":"")+"'>"+xh(t.tache)+"</span>"
+          +(nc>0?"<span class='ph-badge'>📷"+nc+"</span>":"")
           +"<span class='ordre-badge'>"+t.ordre+"</span>"
           +"</div>"
           +"<div class='trow-body'>"
@@ -1092,10 +1164,15 @@ function renderWizTachesEsp(cage,panel){
     +" value='"+xh(constData.note)+"'"
     +" data-ck='"+xh(constKey)+"' oninput='setConstatNote(this)'/>";
 
-  /* Photos constat */
+  /* Photos constat avec bouton supprimer */
   constPhotos.forEach(function(p){
     if(!p)return;
-    h+="<img src='"+p.dataUrl+"' style='width:44px;height:44px;object-fit:cover;border-radius:6px;border:1px solid rgba(255,184,0,.3);cursor:pointer;' onclick='openLbx(\"" +p.id+ "\",event)' alt=''/>"
+    h+="<span style='position:relative;display:inline-block'>"
+      +"<img src='"+p.dataUrl+"' style='width:44px;height:44px;object-fit:cover;border-radius:6px;border:1px solid rgba(255,184,0,.3);cursor:pointer;' onclick='openLbx(\""+p.id+"\",event)' alt=''/>"
+      +"<button onclick='delConstatPhotoSaisie(\""+p.id+"\",\""+xh(constKey)+"\")' "
+      +"style='position:absolute;top:-4px;right:-4px;width:16px;height:16px;border-radius:50%;"
+      +"background:rgba(139,46,26,.9);color:#fff;border:none;font-size:10px;cursor:pointer;line-height:1;padding:0;z-index:2'>×</button>"
+      +"</span>";
   });
   h+="<button class='constat-ph-add' data-ck='"+xh(constKey)+"' data-cage='"+cage+"' data-appt='"+appt+"' data-esp='"+xh(esp)+"' onclick='openConstatPhoto(this)'>📷 Photo</button>";
   h+="</div>";
@@ -1155,6 +1232,9 @@ function setConstatNote(inp){
 }
 
 var _constCtx=null;
+
+
+/* ═══ H. GESTION PHOTOS ═══ */
 function openConstatPhoto(btn){
   _constCtx={ck:btn.dataset.ck,cage:btn.dataset.cage,appt:btn.dataset.appt,esp:btn.dataset.esp};
   var d=document.getElementById("fd").value||new Date().toISOString().slice(0,10);
@@ -1168,7 +1248,7 @@ function openConstatPhoto(btn){
 
 async function addConstatPhoto(){
   if(!_constCtx){toast("Contexte manquant","er");return;}
-  var file=document.getElementById("pfi").files[0];
+  var file=document.getElementById("pfi").files[0]||(window._pendingFile||null);
   if(!file){toast("Aucune image","er");return;}
   var comment=document.getElementById("pco").value;
   toast("Compression...");
@@ -1269,7 +1349,7 @@ function handleFile(e){
     drop.innerHTML='<img src="'+ev.target.result+'" style="width:100%;height:100%;object-fit:cover" />';
   };r.readAsDataURL(file);
 }
-function closeMoPh(){document.getElementById("mo-ph").classList.remove("on");_phCtx=null;_constCtx=null;}
+function closeMoPh(){document.getElementById("mo-ph").classList.remove("on");_phCtx=null;_constCtx=null;window._pendingFile=null;document.getElementById('pfi-gallery').value='';}
 async function addPhoto(){
   /* Priorité au contexte constat si ouvert via openConstatPhoto() */
   if(_constCtx)return addConstatPhoto();
@@ -1314,6 +1394,9 @@ function compress(file,maxDim,q){
 
 // ─── PERSISTENCE ───
 function V(id){var el=document.getElementById(id);return el?el.value:"";}
+
+
+/* ═══ C. PERSISTANCE ═══ */
 function collectState(){
   S.ident={date:V("fd"),numero:V("fn"),charge:V("fc"),moe:V("fm"),entreprise:V("fe")};
   S.meteo.tmin=V("tmin");S.meteo.tmax=V("tmax");S.meteo.hum=V("thum");S.meteo.impact=V("timp");
@@ -1324,6 +1407,8 @@ function collectState(){
    EXPORT / IMPORT JSON — sauvegarde complète
    ══════════════════════════════════════════════════ */
 
+
+/* ═══ D. IMPORT / EXPORT ═══ */
 function exportJSON(){
   collectState();
   var data = {
@@ -1421,6 +1506,9 @@ function loadDraft(){
 }
 
 // ─── UTILS ───
+
+
+/* ═══ B. UTILITAIRES ═══ */
 function xh(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 function toast(msg,type){var t=document.getElementById("toast");t.textContent=msg;t.classList.remove("er","ok");if(type)t.classList.add(type);t.classList.add("on");clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove("on");},2500);}
 function fmtDate(iso){if(!iso)return"--";try{var d=new Date(iso+"T12:00");return d.toLocaleDateString("fr-FR",{day:"numeric",month:"long",year:"numeric"});}catch(e){return iso;}}
@@ -1444,17 +1532,117 @@ function toggleMeteoPreview(){
 }
 
 
-function delConstatPhoto(photoId, constKey){
-  if(!confirm("Supprimer cette photo de constat ?"))return;
-  /* Retirer des photos globales */
-  S.photos = S.photos.filter(function(p){ return p.id !== photoId; });
-  /* Retirer de photoIds du constat */
-  if(S.constats && S.constats[constKey]){
-    S.constats[constKey].photoIds = (S.constats[constKey].photoIds||[]).filter(function(id){ return id !== photoId; });
-  }
+async function downloadAllPhotos(){
+  if(!S.photos || !S.photos.length){ toast("Aucune photo à télécharger","er"); return; }
+  if(typeof JSZip === "undefined"){ toast("Chargement JSZip...","ok"); setTimeout(downloadAllPhotos,1500); return; }
+  toast("Création du ZIP...","ok");
+  var zip = new JSZip();
+  var safe = function(s){ return (s||"").replace(/[^a-zA-Z0-9_\-]/g,"_").replace(/_+/g,"_").slice(0,30); };
+  var cntByFolder = {};
+  S.photos.forEach(function(p){
+    /* Dossier = Appartement (cage/appt) */
+    var folder = safe(p.appt||p.cage||"Photos");
+    if(!cntByFolder[folder]) cntByFolder[folder]=0;
+    cntByFolder[folder]++;
+    var idx = String(cntByFolder[folder]).padStart(3,"0");
+    /* Nom fichier : Esp_Lot_Tache_001.jpg */
+    var fname = [safe(p.esp),safe(p.lot),safe(p.tache||"photo"),idx].filter(Boolean).join("_")+".jpg";
+    /* dataUrl → base64 blob */
+    var b64 = p.dataUrl.split(",")[1];
+    zip.folder(folder).file(fname, b64, {base64:true});
+  });
+  var d = document.getElementById("fd").value||new Date().toISOString().slice(0,10);
+  var zipName = "RJ_Photos_"+d.replace(/-/g,"")+".zip";
+  var blob = await zip.generateAsync({type:"blob",compression:"DEFLATE",compressionOptions:{level:6}});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  a.href=url; a.download=zipName;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 10000);
+  toast(S.photos.length+" photo(s) dans "+zipName,"ok");
+}
+
+function deleteAllPhotos(){
+  if(!S.photos || !S.photos.length){ toast("Aucune photo","er"); return; }
+  var n = S.photos.length;
+  if(!confirm("Supprimer TOUTES les "+n+" photos du rapport ?\nCette action est irréversible.")) return;
+  S.photos = [];
+  /* Vider aussi photoIds dans planning et constats */
+  Object.keys(S.planning).forEach(function(cage){
+    Object.keys(S.planning[cage]||{}).forEach(function(appt){
+      Object.keys(S.planning[cage][appt]||{}).forEach(function(esp){
+        Object.keys(S.planning[cage][appt][esp]||{}).forEach(function(lot){
+          Object.keys(S.planning[cage][appt][esp][lot]||{}).forEach(function(tache){
+            var row = S.planning[cage][appt][esp][lot][tache];
+            if(row) row.photoIds = [];
+          });
+        });
+      });
+    });
+  });
+  Object.keys(S.constats||{}).forEach(function(k){
+    if(S.constats[k]) S.constats[k].photoIds = [];
+  });
   saveDraft(true);
-  showPreview(); /* Rafraîchir l'aperçu */
-  toast("Photo supprimée", "ok");
+  if(document.getElementById("prev-ov").classList.contains("on")) showPreview();
+  toast(n+" photo(s) supprimée(s)","ok");
+}
+
+/* Taille des photos dans l'aperçu */
+var _photoSize = 's'; /* s=3col, m=2col, l=1col */
+
+
+/* ═══ I. APERÇU & EXPORT ═══ */
+function setPhotoSize(sz, btn){
+  _photoSize = sz;
+  document.querySelectorAll('.ph-sz').forEach(function(b){ b.classList.remove('on-sz'); });
+  if(btn) btn.classList.add('on-sz');
+  /* Mettre à jour la grille sans reconstruire tout l'aperçu */
+  var colMap = {s:'repeat(3,1fr)', m:'repeat(2,1fr)', l:'1fr'};
+  document.querySelectorAll('#prev-content .prev-ph-grid').forEach(function(g){
+    g.style.gridTemplateColumns = colMap[sz];
+  });
+}
+function updatePhotoCaption(photoId, newCaption){
+  var p = S.photos.find(function(ph){ return ph.id===photoId; });
+  if(p){ p.tache = newCaption; saveDraft(true); }
+}
+
+function _cleanConstat(constKey){
+  /* Si plus aucune photo et statut non critique → repasser à RAS + vider note */
+  if(!S.constats || !S.constats[constKey]) return;
+  var cd = S.constats[constKey];
+  var remainPhotos = (cd.photoIds||[]).filter(function(id){
+    return S.photos.some(function(p){ return p.id===id; });
+  });
+  cd.photoIds = remainPhotos;
+  if(remainPhotos.length === 0){
+    /* Plus de photo → RAS + note vide → disparaît de l'aperçu */
+    cd.statut = "RAS";
+    cd.note   = "";
+  }
+}
+
+function delConstatPhotoSaisie(photoId, constKey){
+  if(!confirm("Supprimer cette photo et son constat ?")) return;
+  S.photos = S.photos.filter(function(p){ return p.id !== photoId; });
+  _cleanConstat(constKey);
+  saveDraft(true);
+  /* Rafraîchir la saisie */
+  if(window._wiz && _wiz.cage) renderTab(_wiz.cage);
+  /* Rafraîchir l'aperçu si ouvert */
+  if(document.getElementById("prev-ov").classList.contains("on")) showPreview();
+  toast("Photo et constat supprimés","ok");
+}
+
+function delConstatPhoto(photoId, constKey){
+  if(!confirm("Supprimer cette photo et son constat ?")) return;
+  S.photos = S.photos.filter(function(p){ return p.id !== photoId; });
+  _cleanConstat(constKey);
+  saveDraft(true);
+  /* Rafraîchir l'aperçu */
+  if(document.getElementById("prev-ov").classList.contains("on")) showPreview();
+  toast("Photo et constat supprimés","ok");
 }
 function showPreview(){
   collectState();
@@ -1596,8 +1784,9 @@ function showPreview(){
     var planSt=S.planning[cage]||{};
     var cagePhotos=S.photos.filter(function(p){return p.cage===cage;});
     if(!cagePhotos.length&&!Object.keys(planSt).length)return;
+    var isFirstCage = bilanH.length===0;
     hasBilan=true;
-    bilanH+="<div class='prev-cage'>";
+    bilanH+="<div class='prev-cage'" + (isFirstCage?"":" style='page-break-before:always;break-before:page;margin-top:0'") + ">";
     bilanH+="<div class='prev-cage-hdr' style='background:"+col+"'>"+cfg.label+" &mdash; "+cfg.sub+"</div>";
     bilanH+="<div class='prev-appt'>";
     var appts=cage==="EXT"?["EXT"]:(CAGES[cage]&&CAGES[cage].lg)||[];
@@ -1611,17 +1800,15 @@ function showPreview(){
       bilanH+="<div class='prev-appt-hdr' style='color:"+col+"'>"
         +appt+(aType?"<span class='prev-appt-type'>"+aType+"</span>":"")
         +"</div>";
-      var esps=appt==="EXT"?["Facade","Hall entree","Cage escalier","Paliers","Toiture"]:(getApptData(appt).zones||[]);
+      var esps=(getApptData(appt).zones||[]);
       esps.forEach(function(esp){
         var espPhotos=apptPhotos.filter(function(p){return p.esp===esp;});
         var espPlan=apptPlan[esp]||{};
-        /* Seules les photos comptent pour l'affichage dans l'aperçu */
-        var hasContent=espPhotos.length;
-        /* Vérifier aussi si un constat non-RAS existe */
+        /* N'afficher l'espace que s'il a au moins une photo */
         var constKeyChk="CONSTAT_"+cage+"_"+appt+"_"+esp;
         var constDataChk=S.constats&&S.constats[constKeyChk];
-        if(constDataChk&&constDataChk.statut&&constDataChk.statut!=="RAS")hasContent=true;
-        if(!hasContent)return;
+        var hasConstPhoto=(constDataChk&&constDataChk.statut&&constDataChk.statut!=="RAS"&&constDataChk.photoIds&&constDataChk.photoIds.length>0);
+        if(!espPhotos.length && !hasConstPhoto) return;
         bilanH+="<div class='prev-esp'><div class='prev-esp-name'>"+esp+"</div>";
         if(espPhotos.length){
           /* Grouper les photos par lot pour n'afficher que ceux avec photos */
@@ -1635,8 +1822,17 @@ function showPreview(){
             var nc=lps.length,gc=nc<=1?"n1":nc===2?"n2":"n3";
             bilanH+="<div class='prev-ph-grid "+gc+"'>";
             lps.forEach(function(p){
+              var capId="cap-"+p.id;
+              var pid=p.id;
               bilanH+="<div class='prev-ph-item'><img src='"+p.dataUrl+"' alt=''/>"
-                +"<div class='prev-ph-cap'><strong>"+xh(p.tache||"")+"</strong>"+(p.comment?"<br>"+xh(p.comment):"")+"</div></div>";
+                +"<div class='prev-ph-cap'>"
+                +"<input id='cap-"+pid+"' type='text' value='"+xh(p.tache||p.lot||"")+"' "
+                +"data-pid='"+pid+"' "
+                +"oninput='updatePhotoCaption(this.dataset.pid,this.value)' "
+                +"style='width:100%;border:none;border-bottom:1px dashed #c4b59a;background:transparent;font-size:8pt;color:#2d1f0e;font-family:inherit;padding:1px 2px;outline:none;' "
+                +"placeholder='Nom de la tâche…'/>"
+                +(p.comment?"<div style='font-size:7.5pt;color:#7a6548;margin-top:1px'>"+xh(p.comment)+"</div>":"")
+                +"</div></div>";
             });
             bilanH+="</div></div>";
           });
@@ -1689,6 +1885,8 @@ function showPreview(){
     "<div class='prev-page prev-page-1'>"+p1+"</div>"
     +"<div class='prev-page prev-page-2' style='margin-top:20px'>"+p2+"</div>";
   document.getElementById("prev-ov").classList.add("on");
+  /* Appliquer la taille de photo sélectionnée */
+  if(window.setPhotoSize) setPhotoSize(_photoSize, document.getElementById("sz-"+_photoSize));
 }
 function hidePreview(){document.getElementById("prev-ov").classList.remove("on");}
 
@@ -1873,6 +2071,8 @@ async function generateWord(){
     var C={VF:"2D5A3D",MR:"7A4F2D",DO:"C17F3A",RE:"8B2E1A",INK:"2D1F0E",GR:"7A6548",BG:"F5F0E8"};
     var body=[],rels=[],imgs=[],rIdx=1;
 
+
+/* ═══ J. GÉNÉRATION WORD ═══ */
     function xe(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
     function wP(runs,o){o=o||{};var pp=[];if(o.spa)pp.push('<w:spacing w:before="'+(o.spa.b||0)+'" w:after="'+(o.spa.a||160)+'"/>');if(o.ali)pp.push('<w:jc w:val="'+o.ali+'"/>');if(o.ind)pp.push('<w:ind w:left="'+o.ind+'"/>');if(o.bdr)pp.push('<w:pBdr><w:bottom w:val="single" w:sz="6" w:space="4" w:color="'+o.bdr+'"/></w:pBdr>');return '<w:p>'+(pp.length?'<w:pPr>'+pp.join('')+'</w:pPr>':'')+runs.join('')+'</w:p>';}
     function wR(t,o){o=o||{};var rp=[];if(o.b)rp.push('<w:b/>');if(o.i)rp.push('<w:i/>');if(o.col)rp.push('<w:color w:val="'+o.col+'"/>');if(o.sz)rp.push('<w:sz w:val="'+o.sz+'"/><w:szCs w:val="'+o.sz+'"/>');if(o.font)rp.push('<w:rFonts w:ascii="'+o.font+'" w:hAnsi="'+o.font+'"/>');return '<w:r>'+(rp.length?'<w:rPr>'+rp.join('')+'</w:rPr>':'')+'<w:t xml:space="preserve">'+xe(t)+'</w:t></w:r>';}
@@ -2151,7 +2351,7 @@ async function generateWord(){
 
     /* ── 03C : Tableau récapitulatif par cage — IDENTIQUE À L'IMAGE ── */
     /* En-tête + une ligne par cage avec % par lot + moyenne pondérée */
-    var mLots=["LOT 01A","LOT 03","LOT 04","LOT 05","LOT 06","LOT 07","LOT 08"];
+    var mLots=["LOT 01A","LOT 02","LOT 03","LOT 04","LOT 05","LOT 06","LOT 07","LOT 08"];
     var cw=720; /* largeur colonne lot */
     var cageCols=["ESC 1","ESC 2","ESC 3","ESC 9"];
     var cageColMap={"ESC 1":C.VF,"ESC 2":C.MR,"ESC 3":"4A6FA0","ESC 9":"8B5A1A","EXT":"5A4A6E"};
@@ -2254,7 +2454,7 @@ async function generateWord(){
         // En-tête appartement
         body.push('<w:p><w:pPr><w:shd w:val="clear" w:color="auto" w:fill="E8E2D8"/><w:spacing w:before="120" w:after="120"/></w:pPr>'+wR("  "+appt+(APPT_REGISTRY[appt]?" — "+APPT_REGISTRY[appt].type:""),{b:true,col:col,sz:20,font:"Calibri"})+'</w:p>');
         // Par espace
-        var esps=appt==="EXT"?["Facade","Hall entree","Cage escalier","Paliers","Toiture"]:(getApptData(appt).zones||[]);
+        var esps=(getApptData(appt).zones||[]);
         esps.forEach(function(esp){
           var espPhotos=apptPhotos.filter(function(p){return p.esp===esp;});
           var espPlan=(apptPlan[esp])||{};
@@ -2313,6 +2513,9 @@ document.addEventListener("DOMContentLoaded",initUI);
 
 
 /* ── Bannière installation PWA iOS ── */
+
+
+/* ═══ K. PWA & INIT ═══ */
 function showPWABanner(){
   var isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
   var isStandalone=window.navigator.standalone===true;
@@ -2327,6 +2530,7 @@ function dismissPWABanner(){
   if(banner)banner.style.display="none";
   localStorage.setItem("pwa_banner_dismissed","1");
 }
+
 </script>
 
 <!-- Bannière PWA iOS -->
