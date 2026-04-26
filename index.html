@@ -182,12 +182,20 @@ select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.o
 .tnote:focus{outline:none;border-color:var(--vf)}
 
 /* ── ACTION BAR ── */
-.abar{position:fixed;bottom:0;left:0;right:0;background:rgba(245,240,232,.95);backdrop-filter:blur(24px) saturate(150%);-webkit-backdrop-filter:blur(24px) saturate(150%);border-top:2px solid var(--vf);padding:var(--s3) var(--s4) calc(var(--s3) + var(--safe-b));z-index:50}
-.abar-in{display:flex;gap:var(--s2);max-width:640px;margin:0 auto}
-.btn{flex:1;padding:14px;border-radius:var(--r);border:none;font-family:Georgia,serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent}
-.btn-p{background:var(--vf);color:#fff;box-shadow:var(--sh2)}
-.btn-p:active{transform:scale(.97)}
-.btn-s{background:var(--pa);color:var(--ink);border:1.5px solid var(--ln2)}
+.abar{position:fixed;bottom:0;left:0;right:0;background:rgba(245,240,232,.97);backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);border-top:1.5px solid var(--ln2);padding:8px 12px calc(8px + var(--safe-b));z-index:50;box-shadow:0 -2px 16px rgba(45,31,14,.08)}
+.abar-in{display:flex;align-items:center;gap:4px;max-width:680px;margin:0 auto}
+.abar-sep{width:1px;height:28px;background:var(--ln2);flex-shrink:0;margin:0 4px}
+.btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 10px;border-radius:10px;border:1.5px solid transparent;font-family:var(--fs);cursor:pointer;transition:all .18s;-webkit-tap-highlight-color:transparent;white-space:nowrap;flex-shrink:0}
+.btn .bi{font-size:18px;line-height:1}
+.btn .bl{font-size:9px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;line-height:1;opacity:.75}
+.btn-p{background:var(--vf);color:#fff;border-color:var(--vf);box-shadow:0 2px 8px rgba(45,90,61,.2)}
+.btn-p:hover{filter:brightness(1.08)}
+.btn-p:active{transform:scale(.96)}
+.btn-s{background:var(--pa);color:var(--ink);border-color:var(--ln2)}
+.btn-s:hover{background:var(--ln2);border-color:var(--ln)}
+.btn-s:active{transform:scale(.96)}
+.btn-danger{background:rgba(139,46,26,.08)!important;border-color:rgba(139,46,26,.3)!important;color:#8b2e1a!important}
+.btn-danger:hover{background:rgba(139,46,26,.16)!important}
 .btn-m{background:var(--mr);color:#fff}
 
 /* ── MODAL ── */
@@ -534,6 +542,18 @@ select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.o
   .prev-ph-grid{grid-template-columns:1fr!important}
   .prev-bar-btns .pbtn{font-size:9px;padding:5px 6px}
 }
+@media(max-width:480px){
+  .abar-in{gap:2px}
+  .btn{padding:5px 7px}
+  .btn .bi{font-size:16px}
+  .btn .bl{font-size:8px}
+  .abar-sep{margin:0 2px}
+}
+@media(max-width:360px){
+  .btn .bl{display:none}
+  .btn{padding:7px 9px}
+  .btn .bi{font-size:18px}
+}
 </style>
 </head>
 <body>
@@ -652,13 +672,38 @@ select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.o
 </div>
 
 <div class="abar"><div class="abar-in">
-  <button class="btn btn-s" onclick="saveDraft()" title="Sauvegarder">&#x1F4BE;</button>
-  <button class="btn btn-s" onclick="exportJSON()" title="Exporter sauvegarde JSON">&#x1F4E4; Export</button>
-  <button class="btn btn-s" onclick="importJSON()" title="Importer sauvegarde JSON">&#x1F4E5; Import</button>
-  <button class="btn btn-s" onclick="showPreview()">&#x1F441; Aper&ccedil;u</button>
-  <button class="btn btn-p" onclick="doGenWord()">&#x1F4DD; Word</button>
-  <button class="btn btn-s" onclick="downloadAllPhotos()" title="Télécharger toutes les photos">&#x1F4F7; Photos</button>
-  <button class="btn btn-s btn-danger" onclick="deleteAllPhotos()" title="Supprimer toutes les photos" style="background:rgba(139,46,26,.15);border-color:rgba(139,46,26,.4);color:#8b2e1a">&#x1F5D1; Vider photos</button>
+
+  <!-- Groupe 1 : Persistance -->
+  <button class="btn btn-s" onclick="saveDraft()" title="Sauvegarder">
+    <span class="bi">💾</span><span class="bl">Sauv.</span>
+  </button>
+  <button class="btn btn-s" onclick="exportJSON()" title="Exporter sauvegarde JSON">
+    <span class="bi">📤</span><span class="bl">Export</span>
+  </button>
+  <button class="btn btn-s" onclick="importJSON()" title="Importer sauvegarde JSON">
+    <span class="bi">📥</span><span class="bl">Import</span>
+  </button>
+
+  <div class="abar-sep"></div>
+
+  <!-- Groupe 2 : Sortie -->
+  <button class="btn btn-s" onclick="showPreview()">
+    <span class="bi">👁</span><span class="bl">Aperçu</span>
+  </button>
+  <button class="btn btn-p" onclick="doGenWord()">
+    <span class="bi">📝</span><span class="bl">Word</span>
+  </button>
+
+  <div class="abar-sep"></div>
+
+  <!-- Groupe 3 : Photos -->
+  <button class="btn btn-s" onclick="downloadAllPhotos()" title="Télécharger toutes les photos (ZIP)">
+    <span class="bi">📦</span><span class="bl">Photos ZIP</span>
+  </button>
+  <button class="btn btn-danger" onclick="deleteAllPhotos()" title="Supprimer toutes les photos">
+    <span class="bi">🗑</span><span class="bl">Vider</span>
+  </button>
+
 </div></div>
 <!-- Input caché pour l'import JSON -->
 <input type="file" id="json-import-input" accept=".json" style="display:none" onchange="handleImportJSON(this)"/>
